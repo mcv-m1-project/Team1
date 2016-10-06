@@ -3,7 +3,7 @@ TRAIN_DATASET_PATH = './DataSetDelivered/train';
 do_readDataset=1;
 do_maxmin=0;
 do_formfactor=0;
-do_fillingratio=0;
+do_fillingratio=1;
 do_freqappearance=0;
 do_signalgrouping=0;
 %% READ DATASET
