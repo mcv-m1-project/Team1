@@ -1,2 +1,4 @@
 # MAC files
 .DS_Store
+DataSetDelivered/
+*.asv
