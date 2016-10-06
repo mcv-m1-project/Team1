@@ -1,0 +1,1 @@
+signal_characteristics('DataSetDelivered/')
