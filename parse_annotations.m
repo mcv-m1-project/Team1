@@ -3,7 +3,7 @@ function [ bounding_boxes, types, num_elems ] = parse_annotations( annotations_f
 
 % Open the annotations file and scan it
 f_id = fopen(annotations_file);
-text = textscan(f_id, '%f %f %f %f %s');
+text = textscan(f_id, '%d %d %d %d %s');
 
 x1 = text{1};
 y1 = text{2};
