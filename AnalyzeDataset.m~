@@ -28,10 +28,7 @@ fillratio_vec=zeros(1,6);
 formFact_vec=zeros(1,6);
 
 %% LOOP FOR EVERY ELEMENT IN THE DATASET
-%Set the length of the dataset in a variable so it is saved in the
-%workspace, it may be useful
-dataset_length = length(train_dataset);
-for i=1:dataset_length
+for i=1:length(train_dataset)
     %Get the information from the ground truth
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
     %For every signal in an image, compute the desired characteristics
@@ -126,9 +123,6 @@ if do_fillingratio
 end
 
 %Clear useless variables:
-clear area bound_box do_fillingratio do_formfactor do_freqappearance ...
-    do_maxmin do_signalgrouping fillratio_vec formFact_vec height i m ...
-    mask num_elems type width
-    
+clear area bound_box do_fillingratio do_formfactor do_freqappeara
 
 disp('Analysis of training dataset finished.');
