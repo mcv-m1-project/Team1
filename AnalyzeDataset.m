@@ -1,9 +1,6 @@
 %% OPTIONS
 DATASET_PATH = 'DataSetDelivered';
-TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
-if ~exist('FULL_TRAIN_VAL_OPTION', 'var')
-    FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
-end
+FULL_TRAIN_VAL_OPTION = 'full'; % Full (train + validation) dataset, train dataset or validation dataset
 do_maxmin=1;
 do_formfactor=1;
 do_fillingratio=1;
@@ -11,6 +8,7 @@ do_freqappearance=1;
 do_signalgrouping=0;
 
 %% READ DATASET
+TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 disp('---------------------------');
 if strcmp(FULL_TRAIN_VAL_OPTION, 'val')
     % Get the validation dataset

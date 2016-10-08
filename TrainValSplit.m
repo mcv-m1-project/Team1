@@ -1,9 +1,9 @@
 %% OPTIONS
 TRAIN_PERCENTAGE = 70;
 DATASET_PATH = 'DataSetDelivered';
-TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 
 %% READ DATASET
+TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 full_dataset = read_train_dataset(TRAIN_DATASET_PATH);
 
 %% COMPUTE TRAIN-VAL SPLIT
