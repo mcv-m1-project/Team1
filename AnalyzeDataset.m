@@ -1,5 +1,9 @@
 %% OPTIONS
-TRAIN_DATASET_PATH = './DataSetDelivered/train';
+DATASET_PATH = 'DataSetDelivered';
+TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
+if ~exist('FULL_TRAIN_VAL_OPTION', 'var')
+    FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
+end
 do_maxmin=1;
 do_formfactor=1;
 do_fillingratio=1;
@@ -7,8 +11,28 @@ do_freqappearance=1;
 do_signalgrouping=0;
 
 %% READ DATASET
-train_dataset = read_train_dataset(TRAIN_DATASET_PATH);
-clear TRAIN_DATASET_PATH;
+disp('---------------------------');
+if strcmp(FULL_TRAIN_VAL_OPTION, 'val')
+    % Get the validation dataset
+    [train_split, val_split] = read_train_val_split(DATASET_PATH);
+    train_dataset = read_train_dataset(TRAIN_DATASET_PATH, val_split);
+    % Display validation split
+    disp('----- VALIDATION SPLIT ----');
+elseif strcmp(FULL_TRAIN_VAL_OPTION, 'train')
+    % Get the train dataset
+    [train_split, val_split] = read_train_val_split(DATASET_PATH);
+    train_dataset = read_train_dataset(TRAIN_DATASET_PATH, train_split);
+    % Display train split
+    disp('------- TRAIN SPLIT -------');
+else
+   % Get the whole dataset
+   train_dataset = read_train_dataset(TRAIN_DATASET_PATH);
+   disp('------ FULL DATASET -------');
+end
+disp('---------------------------');
+
+
+clear DATASET_PATH TRAIN_DATASET_PATH;
 
 %% VARIABLES INITIALIZATION
 %Counters for the total number of signals in the database and the number of
