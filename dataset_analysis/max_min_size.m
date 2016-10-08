@@ -1,5 +1,10 @@
-function [max_size, min_size, ...
-          max_area,min_area,max_width,min_width,max_height,min_height] = max_min_size(train_dataset)
+function [max_global_size, min_global_size]=max_min_size(train_dataset)
+%%max_global_size (and min_global_size) is a 6x3 matrix: each row
+%%represents tha maximmum (and minimmum) values of each type. Each column
+%%is represents area, width, and height
+
+%%[max_size, min_size, ...
+%%          max_area,min_area,max_width,min_width,max_height,min_height] = max_min_size(train_dataset)
 %MAXIMUM_MINIMUM_SIZE Computes the maximum and minimum size of all signals
 
 % MAX AND MIN ABSOLUTE ON THE TRAIN DB
@@ -57,4 +62,6 @@ for i=1:length(train_dataset)
     end    
 end
 
+max_global_size=[max_area' max_width' max_height'];
+min_global_size=[min_area' min_width' min_height'];
 end
