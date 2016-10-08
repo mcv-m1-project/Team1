@@ -13,6 +13,6 @@ signalPixels = nnz(bbPixels);
 
 %The filling ratio of a signal will be the number of pixels with
 %value 1 in the mask divided by the area of the bounding box.
-fillingR = signalPixels/area;
+fillingR = double(signalPixels)/double(area);
 
 end

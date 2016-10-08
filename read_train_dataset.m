@@ -7,7 +7,7 @@ num_images = size(list_images);
 
 struct_counter = 1;
 for ind=1:num_images
-   if ~list_images(ind).isdir
+   if ~list_images(ind).isdir && ( strcmp(list_images(ind).name(end-2:end),'ppm')==1 || strcmp(list_images(ind).name(end-2:end),'jpg')==1 || strcmp(list_images(ind).name(end-2:end),'png') )
        % Name 
        name = strrep(list_images(ind).name, '.jpg', '');
        % Image
