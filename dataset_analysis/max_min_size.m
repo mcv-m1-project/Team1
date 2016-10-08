@@ -1,29 +1,13 @@
 function [max_global_size, min_global_size]=max_min_size(train_dataset)
-%%max_global_size (and min_global_size) is a 6x3 matrix: each row
-%%represents tha maximmum (and minimmum) values of each type. Each column
-%%is represents area, width, and height
-
-%%[max_size, min_size, ...
-%%          max_area,min_area,max_width,min_width,max_height,min_height] = max_min_size(train_dataset)
-%MAXIMUM_MINIMUM_SIZE Computes the maximum and minimum size of all signals
+%MAX_MIN_SIZE Computes the maximum and minimum size of all signals
+% max_global_size (and min_global_size) is a 6x3 matrix: each row
+% represents tha maximmum (and minimmum) values of each type of signal. 
+% Each column represents area, width and height.
 
 % MAX AND MIN ABSOLUTE ON THE TRAIN DB
 max_size=[0, 0, 0];         %%max_size= area, width and height
 min_size=[1000, 0, 0];      %%min_size= area, width and height
 
-% MAX AND MIN OF EACH TYPE OF SIGNALS
-% max_A= [0,0,0];             
-% max_B= [0,0,0];
-% max_C= [0,0,0];
-% max_D= [0,0,0];
-% max_E= [0,0,0];
-% max_F= [0,0,0];
-% min_A= [10000,0,0];
-% min_B= [10000,0,0];
-% min_C= [10000,0,0];
-% min_D= [10000,0,0];
-% min_E= [10000,0,0];
-% min_F= [10000,0,0];
 max_area=[0,0,0,0,0,0];
 min_area=[10000,10000,10000,10000,10000,10000];
 max_width=[0,0,0,0,0,0];
@@ -39,7 +23,6 @@ for i=1:length(train_dataset)
         c2=bound_box(m, 2);
         c3=bound_box(m, 3);
         c4=bound_box(m, 4);
-        types=type{m};
         area=(c3-c1)*(c4-c2);
         if(max_size(1)<area)        %%if the area of max_size is smaller than the actual area
             max_size=[area, (c4-c2), (c3-c1)];

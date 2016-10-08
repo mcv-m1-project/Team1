@@ -28,12 +28,7 @@ fillratio_vec=zeros(1,6);
 formFact_vec=zeros(1,6);
 
 %% LOOP FOR EVERY ELEMENT IN THE DATASET
-%Set the length of the dataset in a variable so it is saved in the
-%workspace, it may be useful
-disp('Processing the dataset...');
-disp('');
-dataset_length = length(train_dataset);
-for i=1:dataset_length
+for i=1:length(train_dataset)
     %Get the information from the ground truth
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
     %For every signal in an image, compute the desired characteristics
@@ -93,7 +88,7 @@ if do_freqappearance
     %Divide the number of signals of a type by the total number of signals 
     %to obtain values between 0 and 1
     freqApp_v=type_count./signal_count;
-    disp('The frequency of appearance of each type of signal is: ');
+    disp('The frequency of appearance for each type of signal is: ');
     disp(freqApp_v);
 end
 
@@ -116,21 +111,18 @@ end
 %% FORM FACTOR MEAN
 if do_formfactor
     formFactor_means = double(formFact_vec)./double(type_count);
-    disp('The mean form factor for each type of signal is: ');
+    disp('The form factor for each type of signal is: ');
     disp(formFactor_means);
 end
         
 %% FILLING RATIO MEAN
 if do_fillingratio
     fillingRatio_means = double(fillratio_vec)./double(type_count);
-    disp('The mean filling ratio for each type of signal is: '); 
+    disp('The filling ratio for each type of signal is: '); 
     disp(fillingRatio_means);
 end
 
 %Clear useless variables:
-clear area bound_box do_fillingratio do_formfactor do_freqappearance ...
-    do_maxmin do_signalgrouping fillratio_vec formFact_vec height i m ...
-    mask num_elems type width
-    
+clear area bound_box do_fillingratio do_formfactor do_freqappeara
 
 disp('Analysis of training dataset finished.');
