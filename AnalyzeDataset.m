@@ -4,7 +4,7 @@ do_maxmin=1;
 do_formfactor=1;
 do_fillingratio=1;
 do_freqappearance=1;
-do_signalgrouping=0;
+do_signalgrouping=1;
 
 %% READ DATASET
 train_dataset = read_train_dataset(TRAIN_DATASET_PATH);
@@ -26,6 +26,8 @@ min_height=ones(1,6)*1000;
 fillratio_vec=zeros(1,6);
 %Vector that will contain the total form factor for each type of signal
 formFact_vec=zeros(1,6);
+%Vectors that will contain the signals (name of the file) of each group
+typeGrouping=cell(1,6);
 
 %% LOOP FOR EVERY ELEMENT IN THE DATASET
 %Set the length of the dataset in a variable so it is saved in the
@@ -79,9 +81,9 @@ for i=1:dataset_length
 
         %% SIGNALS GROUPING BY SHAPE AND COLOR
         if do_signalgrouping
-            %TODO
-            disp('Grouping the signals by shape and color...');
-            group_sign = signal_grouping(train_dataset);
+            %The name of the image where we can find the signal is added to
+            %the corresponding type array
+            typeGrouping{type{m}}{end+1}={train_dataset(i).name};
         end
     end
     
