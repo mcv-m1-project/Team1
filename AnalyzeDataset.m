@@ -39,6 +39,7 @@ disp('Processing the dataset...');
 disp('');
 dataset_length = length(train_dataset);
 hold on;
+axis([0.4 1.1 0 7]);
 for i=1:dataset_length
     %Get the information from the ground truth
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
@@ -89,9 +90,10 @@ for i=1:dataset_length
         if do_fillingratio
             %Compute the filling ratio of the signal and add it to the
             %total filling ratio of the corresponding type
-            fillratio_vec(type{m}) = fillratio_vec(type{m}) + filling_ratio(bound_box(m,:), mask);
+            FR = filling_ratio(bound_box(m,:), mask);
+            fillratio_vec(type{m}) = fillratio_vec(type{m}) + FR;
             if plot_FR
-                plot(filling_ratio(bound_box(m,:), mask), type{m},'+')
+                plot(FR, type{m},'*')
             end
         end
 
@@ -147,8 +149,8 @@ end
 
 %Clear useless variables:
 clear area bound_box do_fillingratio do_formfactor do_freqappearance ...
-    do_maxmin do_signalgrouping  formFact_vec height i m ...
-    mask num_elems type width
+    do_maxmin do_signalgrouping fillratio_vec formFact_vec height i m ...
+    mask num_elems type width plotFR
     
 
 disp('Analysis of training dataset finished.');
