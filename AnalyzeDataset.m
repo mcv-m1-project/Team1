@@ -31,7 +31,9 @@ fillratio_vec=zeros(1,6);
 formFact_vec=zeros(1,6);
 %Vectors that will contain the signals (name of the file) of each group
 typeGrouping=cell(1,6);
-
+%Cell array that will contain the name of the images where the mask of a
+%signal is missing
+nomask=[];
 %% LOOP FOR EVERY ELEMENT IN THE DATASET
 %Set the length of the dataset in a variable so it is saved in the
 %workspace, it may be useful
@@ -55,6 +57,11 @@ for i=1:dataset_length
         %mask==1), we go onto the next signal
         if nnz(mask(bound_box(1):bound_box(1)+height, ...
                 bound_box(2):bound_box(2)+width))==0
+            if size(nomask,1)==0 
+                nomask=[nomask;train_dataset(i).name];
+            elseif nomask(end)~=train_dataset(i).name
+                nomask=[nomask;train_dataset(i).name];
+            end
             continue
         end
         
@@ -147,10 +154,15 @@ if do_fillingratio
     disp(fillingRatio_means);
 end
 
+disp('The following images are missing the mask for one or more of its signals, ')
+disp('so they were not taken into account in the analysis: ');
+disp(nomask);
+
 %Clear useless variables:
 clear area bound_box do_fillingratio do_formfactor do_freqappearance ...
     do_maxmin do_signalgrouping fillratio_vec formFact_vec height i m ...
-    mask num_elems type width plotFR
+    mask num_elems type width plotFR nomask
     
+
 
 disp('Analysis of training dataset finished.');
