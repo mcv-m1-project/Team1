@@ -14,8 +14,9 @@ end
 %% MAXIMUM AND MINIMUM SIZE
 if do_maxmin
     disp('Computing maximum and minimum size...');
-    [max_size, min_size, ...
-   max_area,min_area,max_width,min_width,max_height,min_height] = max_min_size(train_dataset)
+    [max_size, min_size]=max_min_size(train_dataset)
+    %%[max_size, min_size, ...
+   %%max_area,min_area,max_width,min_width,max_height,min_height] = max_min_size(train_dataset)
 end
 %% FORM FACTOR
 if do_formfactor
