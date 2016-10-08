@@ -6,7 +6,7 @@ list_images = dir(dataset_path);
 
 struct_counter = 1;
 for ind=1:size(list_images)
-   if ~list_images(ind).isdir
+   if ~list_images(ind).isdir && ( strcmp(list_images(ind).name(end-2:end),'ppm')==1 || strcmp(list_images(ind).name(end-2:end),'jpg')==1 || strcmp(list_images(ind).name(end-2:end),'png') )
        % Name 
        name = strrep(list_images(ind).name, '.jpg', '');
        % Image
