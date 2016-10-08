@@ -1,4 +1,9 @@
 # MAC files
 .DS_Store
-DataSetDelivered/
+
+# Dataset
+DataSetDelivered/train
+DataSetDelivered/test
+
+# MATLAB files
 *.asv
