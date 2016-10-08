@@ -1,4 +1,10 @@
 # MAC files
 .DS_Store
+
+# Dataset
 DataSetDelivered/
+!./DataSetDelivered/train_split.txt
+!./DataSetDelivered/val_split.txt
+
+# MATLAB files
 *.asv
