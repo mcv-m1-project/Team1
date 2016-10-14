@@ -106,7 +106,34 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space)
     switch space
         case 'normrgb'
             pixelCandidates = im(:,:,1)>100;
+        case 'hsv'
+            %%canviar el colorspace a HSV im_hsv=rgb2hsv(im)
+            I=rgb2hsv(im);
+            % Define Thresholds for Blue Signals
+            HueMinRed = 0.9;
+            HueMaxRed = 0.07;
+            SatMinRed=0.3;
+            SatMaxRed=0.8;
+            ValueMinRed=0.1;
+            ValueMaxRed=0.5; %%0.6
+%             SatMinRed = 0.3;
+%             SatMaxRed = 0.9;
+%             ValueMinRed = 0.30;
+%             ValueMaxRed = 0.9;
+            % Define Thresholds for Blue Signals
+            HueMinBlue = 0.52;
+            HueMaxBlue = 0.8;
+            SatMinBlue=0.022;
+            SatMaxBlue=0.43; %%0.9
+            ValueMinBlue=0.1;
+            ValueMaxBlue=0.4; %%0.6
+   %%         SatMinBlue = 0.3;
+   %%         SatMaxBlue = 0.85;
+   %%         ValueMinBlue = 0.05;
+   %%         ValueMaxBlue = 0.95;
             
+            pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
+
         otherwise
             error('Incorrect color space defined');
             return
