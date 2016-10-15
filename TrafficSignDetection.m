@@ -47,23 +47,31 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
     files = ListFiles(directory);
+     histo_total=load('DataSetDelivered/pdf_hsv.mat');
+    histo_total=histo_total.pdf_normalize;
+   
+    tic
+   % for i=1:size(files,1)
     
-    for i=1:size(files,1),
-
-        i
-        
+        [train_split, val_split] = read_train_val_split(directory);
+    val_dataset = read_train_dataset([directory '/train/'], val_split);
+    size(val_dataset,2)
+    for i=1:size(val_dataset,2)
         % Read file
-        im = imread(strcat(directory,'/',files(i).name));
+       % im = imread(strcat(directory,'/',files(i).name));
+      im = imread(val_dataset(i).image);
      
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method);
+        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method,histo_total);
         
         
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
         
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
-        pixelAnnotation = imread(strcat(directory, '/mask/mask.', files(i).name(1:size(files(i).name,2)-3), 'png'))>0;
+       % pixelAnnotation = imread(strcat(directory, '/mask/mask.', files(i).name(1:size(files(i).name,2)-3), 'png'))>0;
+       pixelAnnotation = imread(val_dataset(i).mask)>0;
+      
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
@@ -77,7 +85,7 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
         % windowFN = windowFN + localWindowFN;
         % windowFP = windowFP + localWindowFP;
     end
-
+    [pixelTP, pixelFP, pixelFN, pixelTN]
     % Plot performance evaluation
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
     % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
@@ -99,10 +107,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space)
+function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_total)
 
     im=double(im);
-
     switch space
         case 'normrgb'
             pixelCandidates = im(:,:,1)>100;
@@ -132,8 +139,28 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space)
    %%         ValueMinBlue = 0.05;
    %%         ValueMaxBlue = 0.95;
             
-            pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
-
+          %  pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
+          a=I(:,:,1);
+          b=I(:,:,2);
+          for s1=1:size(im,1)
+            for s2=1:size(im,2)
+          pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > 0.3);
+       %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+            end
+          end
+        case 'lab'
+             
+            I=colorspace('Lab-<',im);
+           a=I(:,:,2);
+          b=I(:,:,3);
+          for s1=1:size(im,1)
+            for s2=1:size(im,2)
+              round((a(s1,s2)+ 126)/2)+1
+              round((b(s1,s2)+ 126)/2)+1
+          pixelCandidates(s1,s2)= (histo_total(round((a(s1,s2)+ 126)/2)+1,round((b(s1,s2)+ 126)/2)+1) > 0.3);
+       %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+            end
+          end
         otherwise
             error('Incorrect color space defined');
             return
