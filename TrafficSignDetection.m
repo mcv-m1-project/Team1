@@ -100,7 +100,7 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     %profile off
     
 end
-plot(PRC(:,:,1), PRC(:,:,2), 'b.-')
+plot(PRC(:,1), PRC(:,2), 'b.-')
 axis([0 1 0 1])
 xlabel('Recall')
 ylabel('Precision')
