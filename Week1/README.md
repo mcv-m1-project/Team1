@@ -9,7 +9,7 @@ Place the provided training and testing datasets inside a folder named
 
 - **Analyze Dataset**
 
-Run the `AnalyzeDataset.m` script. By default it analyzes the whole dataset (train + validation split), but you can analyze a particular split by changing the `FULL_TRAIN_VAL_OPTION` variable inside the script.
+Run the `AnalyzeDataset.m` script. By default it analyzes the whole dataset (train + validation split), but you can analyze a particular split by changing the `FULL_TRAIN_VAL_OPTION` variable inside the script. The signals that don't have any pixel set to '1' inside their bounding box are not used for the analysis.
 
 Bear in mind that an already computed train-validation split is needed for these cases to run, so you should run first `TrainValSplit.m`.
 
