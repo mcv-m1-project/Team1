@@ -1,5 +1,5 @@
 function calculateTrainHists()
-
+close all
 DATASET_PATH = 'DataSetDelivered';
 %READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
@@ -81,21 +81,17 @@ edges = {n1; n2};
 
 %calculate the histogram with the 2 first components
 histoABC= hist3([masked_comp_ABC',masked_comp2_ABC'],'Edges', edges);
-histoABC=histoABC/max(max(histoABC));
 
 histoDF= hist3([masked_comp_DF',masked_comp2_DF'],'Edges', edges);
-histoDF=histoDF/max(max(histoDF));
 
 histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
-histoE=histoE/max(max(histoE));
 
 
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
-pdf_normalize = (pdf./ max(max(pdf)));% pdf normalization
 
 if saveHist
     %store normalized histograms
-    save('DataSetDelivered/HistALL_hsv.mat','pdf_normalize');
+    save('DataSetDelivered/HistALL_hsv.mat','pdf');
     save('DataSetDelivered/HistABC_hsv.mat','histoABC');
     save('DataSetDelivered/HistDF_hsv.mat','histoDF');
     save('DataSetDelivered/HistE_hsv.mat','histoE');
@@ -119,7 +115,7 @@ if plotHist
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     figure('name', 'All signal types');
-    bar3(pdf_normalize)
+    bar3(pdf)
     xlabel('1st comp'); ylabel('2nd comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     

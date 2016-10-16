@@ -8,7 +8,7 @@ function [output_args] = loadHistograms(type, colorspace, modified)
 if strcmp(type,'joint')
     name = strcat('DataSetDelivered/HistALL_',colorspace,modified,'.mat');
     var=load(name);
-    output_args=var.pdf_normalize;
+    output_args=var.pdf;
 else
     name = strcat('DataSetDelivered/HistABC_',colorspace,modified,'.mat');
     var=load(name);
