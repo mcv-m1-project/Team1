@@ -2,7 +2,7 @@
 % Template example for using on the validation set.
 % 
  
-function TrafficSignDetection(directory, pixel_method, window_method, decision_method, ThresholdRange)
+function TrafficSignDetection_PR(directory, pixel_method, window_method, decision_method, ThresholdRange)
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
     % using a color segmentation. Then, using the color segmentation as a basis, the most likely window 
