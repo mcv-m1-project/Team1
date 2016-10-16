@@ -48,7 +48,7 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
     files = ListFiles(directory);
-     histo_total=load('DataSetDelivered/HistALL_lab.mat');
+     histo_total=load('DataSetDelivered/HistALL_hsv.mat');
     histo_total = (histo_total.pdf./ max(max(histo_total.pdf)));% pdf normalization
             
     size(histo_total)
@@ -119,18 +119,35 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_tota
         case 'normrgb'
             pixelCandidates = im(:,:,1)>100;
         case 'hsv'
+        space='hsv';
             %%canviar el colorspace a HSV im_hsv=rgb2hsv(im)
-            I=rgb2hsv(im);
-
-          %  pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
-          a=I(:,:,1);
-          b=I(:,:,2);
-          for s1=1:size(im,1)
+          hist_individual = loadHistograms('', space,'_mod');
+        histoABC = hist_individual{1};
+        histoDF = hist_individual{2};
+        histoE = hist_individual{3};
+        histoABC=histoABC./max(max(histoABC));
+        histoDF=histoDF/max(max(histoDF));
+        histoE=histoE/max(max(histoE));
+        
+        %Initialize result mask
+        pixelCandidates=zeros(size(im,1),size(im,2));
+        
+        %Transform the image to HSV
+        im_cs=rgb2hsv(im);
+        %Take the Hue and Saturation components
+        H=im_cs(:,:,1);
+        S=im_cs(:,:,2);
+        
+        %For each pixel in the test image, check its probability of
+        %belonging to a signal (if its color is represented in the signal
+        %histograms)
+        for s1=1:size(im,1)
             for s2=1:size(im,2)
-                pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > 0.3);
-                %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+                if histoABC(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoDF(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoE(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
+                    pixelCandidates(s1,s2)= 1;
+                end
             end
-          end
+        end
         case 'lab'
              
          %   I=colorspace('Lab-<',im);
