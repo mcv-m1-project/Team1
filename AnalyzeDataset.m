@@ -134,6 +134,11 @@ for i=1:dataset_length
     end
     
 end
+if plot_FR
+    title('Filling ratio distribution per signal type');
+    ylabel('Signal type');
+    xlabel('Filling ratio');    
+end
 hold off;
 
 %% FREQUENCY OF APPEARANCE
