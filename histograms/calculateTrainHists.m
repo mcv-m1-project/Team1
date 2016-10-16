@@ -8,7 +8,7 @@ TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 [train_split, ~] = read_train_val_split(DATASET_PATH);
 train_dataset = read_train_dataset(TRAIN_DATASET_PATH, train_split);
 
-saveHist = false;
+saveHist = true;
 plotHist = true;
 
 masked_comp_ABC=[];
@@ -31,13 +31,15 @@ for i=1: size(train_dataset,2)
     if strcmp(colorsp,'hsv')
         im_cs=rgb2hsv(im);
     elseif strcmp(colorsp,'lab')
-        im_cs=colorspace('Lab-<',im);
+       % im_cs=colorspace('Lab-<',im);
+       colorTransform = makecform('srgb2lab');
+        im_cs = applycform(im, colorTransform);
         min_c2 = 0.1;
         min_c3 = 0.1;
     end
     %take the first 2 components of the image in the new color space
-    comp=im_cs(:,:,1);
-    comp2=im_cs(:,:,2);
+    comp=im_cs(:,:,2);
+    comp2=im_cs(:,:,3);
     
     %parse annotations to get signal type
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
@@ -72,8 +74,11 @@ if strcmp(colorsp,'hsv')
     n2=0:1/63:1;
 elseif strcmp(colorsp,'lab')
     %n for LAB
-    n1=-127:2:127;
-    n2=-127:2:127;
+  %  n1=-127:2:127;
+ %   n2=-127:2:127;
+ n1=-200:2:200;
+ 
+ n2=-200:2:200;
 end
 
 %Define the edges of the bins in the histograms
@@ -90,8 +95,7 @@ histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
 
 if saveHist
-<<<<<<< HEAD
-    %store normalized histograms
+    % store normalized histograms
     save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
     save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
     save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');

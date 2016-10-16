@@ -47,8 +47,10 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
     files = ListFiles(directory);
-     histo_total=load('DataSetDelivered/pdf_hsv.mat');
-    histo_total=histo_total.pdf_normalize;
+     histo_total=load('DataSetDelivered/HistALL_lab.mat');
+    histo_total = (histo_total.pdf./ max(max(histo_total.pdf)));% pdf normalization
+            
+    size(histo_total)
    
     tic
    % for i=1:size(files,1)
@@ -57,6 +59,7 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     val_dataset = read_train_dataset([directory '/train/'], val_split);
     size(val_dataset,2)
     for i=1:size(val_dataset,2)
+        i/size(val_dataset,2)*100
         % Read file
        % im = imread(strcat(directory,'/',files(i).name));
       im = imread(val_dataset(i).image);
@@ -116,29 +119,7 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_tota
         case 'hsv'
             %%canviar el colorspace a HSV im_hsv=rgb2hsv(im)
             I=rgb2hsv(im);
-            % Define Thresholds for Blue Signals
-            HueMinRed = 0.9;
-            HueMaxRed = 0.07;
-            SatMinRed=0.3;
-            SatMaxRed=0.8;
-            ValueMinRed=0.1;
-            ValueMaxRed=0.5; %%0.6
-%             SatMinRed = 0.3;
-%             SatMaxRed = 0.9;
-%             ValueMinRed = 0.30;
-%             ValueMaxRed = 0.9;
-            % Define Thresholds for Blue Signals
-            HueMinBlue = 0.52;
-            HueMaxBlue = 0.8;
-            SatMinBlue=0.022;
-            SatMaxBlue=0.43; %%0.9
-            ValueMinBlue=0.1;
-            ValueMaxBlue=0.4; %%0.6
-   %%         SatMinBlue = 0.3;
-   %%         SatMaxBlue = 0.85;
-   %%         ValueMinBlue = 0.05;
-   %%         ValueMaxBlue = 0.95;
-            
+
           %  pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
           a=I(:,:,1);
           b=I(:,:,2);
@@ -150,14 +131,23 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_tota
           end
         case 'lab'
              
-            I=colorspace('Lab-<',im);
+         %   I=colorspace('Lab-<',im);
+         colorTransform = makecform('srgb2lab');
+        I = applycform(im, colorTransform);
+       
            a=I(:,:,2);
           b=I(:,:,3);
           for s1=1:size(im,1)
             for s2=1:size(im,2)
-              round((a(s1,s2)+ 126)/2)+1
-              round((b(s1,s2)+ 126)/2)+1
-          pixelCandidates(s1,s2)= (histo_total(round((a(s1,s2)+ 126)/2)+1,round((b(s1,s2)+ 126)/2)+1) > 0.3);
+         %       disp(' a value')
+          %      a(s1,s2)
+           %     disp ('histogram value a')
+            % round((a(s1,s2)+1001)/19.99)+1
+            %  disp(' b value')
+            %  b(s1,s2)
+            %  disp('histogram value b')
+           %  round((b(s1,s2)+1001)/19.99)+1
+          pixelCandidates(s1,s2)= (histo_total(round((a(s1,s2)+201)/1.99)+1,round((b(s1,s2)+201)/1.99)+1) > 0.3);
        %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
             end
           end

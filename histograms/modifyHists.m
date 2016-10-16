@@ -14,8 +14,6 @@ histoDF = hist_individual{2};
 histoE = hist_individual{3};
 
 %Parameters
-max_c1
-
 
 
 if saveHist
