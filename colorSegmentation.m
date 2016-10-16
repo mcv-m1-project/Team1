@@ -27,7 +27,7 @@ histoE = hist_individual{3};
         
         %Normalitzar el histograma (histo es l'histograma dels senyals de tipus A,
         %s'haura de fer per a cadascun en el lloc que toqui)
-        histoABC=histoABC/max(max(histoABC));
+        histoABC=histoABC./max(max(histoABC));
         histoDF=histoDF/max(max(histoDF));
         histoE=histoE/max(max(histoE));
         
@@ -37,7 +37,7 @@ histoE = hist_individual{3};
         FN=zeros(1,10);
         TN=zeros(1,10);
         %calculate mask for each image in the dataset
-        for i=1:10 %size(fullDataset,2)
+        for i=1:size(fullDataset,2)
             
             im=imread(fullDataset(i).image);
             [bound_box, type, num_elems] = parse_annotations(fullDataset(i).annotations);
@@ -45,8 +45,8 @@ histoE = hist_individual{3};
             
             for it=1:num_elems
                 %show original image
-                figure;
-                imshow(im);
+                %figure;
+                %imshow(im);
                 
                 %initialize mask with zeros
                 created_mask=zeros(size(im,1),size(im,2));
@@ -78,13 +78,13 @@ histoE = hist_individual{3};
                             created_mask(s1,s2)= 1;
                         end
                         
+                        sc1 = histoABC(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
+                        sc2 = histoDF(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
+                        sc3 = histoE(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
+                        
+                        score = max(max(sc1,sc2),sc3);
                         
                         for t=0:0.1:1
-                            
-                            sc1 = histoABC(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
-                            sc2 = histoDF(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
-                            s3 = histoE(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1);
-                            score = max(max(s1,s2),s3);
                             if score > t    % scored positive
                                 if mask(s1,s2)==1 % labeled positive
                                     TP(1,round(t*9)+1)=TP(1,round(t*9)+1)+1;
@@ -107,17 +107,20 @@ histoE = hist_individual{3};
                 end
                 
             end
-            figure;
+            %figure;
             
             %show created mask
-            imshow(created_mask)
+            %imshow(created_mask)
             
             %store created mask
             %imwrite(created_mask,[fullDataset(i).mask(1:end-4), '-created.png'])
             
         end
         roc = [];
-        
+        TP
+        FP
+        TN
+        FN
         precision=zeros(1,10);
         accuracy=zeros(1,10);
         for k = 1:10
