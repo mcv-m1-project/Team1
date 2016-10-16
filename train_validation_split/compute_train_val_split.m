@@ -1,4 +1,4 @@
-function [ train_list, val_list ] = compute_train_val_split( full_dataset, train_percentage )
+function [ train_list, val_list ] = compute_train_val_split( full_dataset, train_percentage, plot_clusters)
 %COMPUTE_TRAIN_VAL_SPLIT Computes the train and validation splits 
 % Given a full dataset (in a nonscalar struct, as returned by
 % read_train_dataset.m) and the percentage of elements in the train split
@@ -7,6 +7,10 @@ function [ train_list, val_list ] = compute_train_val_split( full_dataset, train
 % dataset) and a list of the elements that belong to the validation split 
 % (approximately (100 - train_percentage) % of the
 % elements in the full dataset).
+
+if nargin < 3
+    plot_clusters = 0;
+end
 
 % Pre-allocate features matrix
 dataset_length = length(full_dataset);
@@ -44,6 +48,7 @@ end
 % Iterate over all categories of signals to cluster them by features,
 % and then select a partition for each cluster for each type of signal
 num_categories = 6;
+categories_names = {'Type A', 'Type B', 'Type C', 'Type D', 'Type E', 'Type F'};
 k_clustering = [2 2 2 2 2 2];   % k clustering value for each category
 for cat=1:num_categories
    % Get features matrix for that category 
@@ -55,8 +60,15 @@ for cat=1:num_categories
    cluster_indices = kmeans(X_cat, k_cat);
    original_matrix_ind = find(matrix_indices);
    
+   % PCA to plot the clusters
+   if plot_clusters
+       [coeff, score, dummy] = pca(X_cat);
+       vbls = {'area', 'height', 'width', 'filling ratio', 'form factor'};
+   end
+   
    % For each cluster, shuffle all the indices and split them in train and
    % validation depending on the train_percentage value.
+   colors = [0.9 0.1 0.1; 0.1 0.1 0.9];
    for c_ind=1:k_cat
        
        % Random permutation
@@ -66,10 +78,22 @@ for cat=1:num_categories
        rand_permutation = randperm(num_elems_cluster);
        m_ind_shuffled = m_ind(rand_permutation);
        
+       % Scatter plot of clusters
+       if plot_clusters
+           f = scatter(score(selection_ind, 1), score(selection_ind, 2), 25, colors(c_ind, :), 'filled');
+           hold on;
+       end
+       
        % Append the indices to the train and validation set
        train_list = [train_list; m_ind_shuffled(1:round(train_prob*num_elems_cluster))];
        val_list = [val_list; m_ind_shuffled((round(train_prob*num_elems_cluster) + 1):end)];
        
+   end
+   if plot_clusters
+       xlabel('PC 1');
+       ylabel('PC 2');
+       title(categories_names{cat});
+       waitfor(f);
    end
 end
 
