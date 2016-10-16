@@ -31,6 +31,6 @@ Run the TrafficSignDetection_test script with the necessary input arguments. For
  - modifyHist(): change the code at your will to modify the histograms (eliminate low-saturated values for example).
  
  
-- ** Computing masks for validation set **
+- **Computing masks for validation set**
 
 Run the TrafficSignDetection script with the necessary input arguments. For example TrafficSignDetection_test('DataSetDelivered/train','hsv','',''). This function will print Precision, Accuracy Specificity and Sensitivity pixel values.
