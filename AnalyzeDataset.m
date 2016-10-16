@@ -1,7 +1,7 @@
 close all;
 %% OPTIONS
 DATASET_PATH = 'DataSetDelivered';
-FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
+FULL_TRAIN_VAL_OPTION = 'val'; % Full (train + validation) dataset, train dataset or validation dataset
 do_maxmin=0;
 do_formfactor=0;
 do_fillingratio=0;

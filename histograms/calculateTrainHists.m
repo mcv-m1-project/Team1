@@ -8,7 +8,7 @@ TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 [train_split, ~] = read_train_val_split(DATASET_PATH);
 train_dataset = read_train_dataset(TRAIN_DATASET_PATH, train_split);
 
-saveHist = true;
+saveHist = false;
 plotHist = true;
 
 masked_comp_ABC=[];
@@ -30,12 +30,14 @@ for i=1: size(train_dataset,2)
     %convert to desired color space
     if strcmp(colorsp,'hsv')
         im_cs=rgb2hsv(im);
-    elseif strcmp(colorsp,'lab')
-       % im_cs=colorspace('Lab-<',im);
-       colorTransform = makecform('srgb2lab');
-        im_cs = applycform(im, colorTransform);
-        min_c2 = 0.1;
-        min_c3 = 0.1;
+        %%take the hue and saturation in the new color space
+        comp=im_cs(:,:,1);
+        comp2=im_cs(:,:,2);
+    elseif strcmp(colorsp,'ycrcb')
+        im_cs = rgb2ycbcr(im);
+        %take the 2 components of the chroma in the new color space
+        comp=im_cs(:,:,2);
+        comp2=im_cs(:,:,3);
     end
     %take the first 2 components of the image in the new color space
     comp=im_cs(:,:,2);
@@ -43,7 +45,7 @@ for i=1: size(train_dataset,2)
     
     %parse annotations to get signal type
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
-    
+    mask=imread(train_dataset(i).mask);
     %For every signal in the image, save the non-zero values 
     for it=1:num_elems 
         if nnz(mask) == 0
@@ -72,13 +74,10 @@ if strcmp(colorsp,'hsv')
     %n for HSV
     n1=0:1/63:1;
     n2=0:1/63:1;
-elseif strcmp(colorsp,'lab')
-    %n for LAB
-  %  n1=-127:2:127;
- %   n2=-127:2:127;
- n1=-500:2:500;
- 
- n2=-500:2:500;
+elseif strcmp(colorsp,'ycrcb')
+    %n for YCRCB
+    n1=0:3.5:240;
+    n2=0:3.5:240;
 end
 
 %Define the edges of the bins in the histograms
