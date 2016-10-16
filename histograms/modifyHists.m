@@ -5,10 +5,11 @@ function modifyHists()
 
 saveHist = false;
 plotHist = true;
+colorspace = 'hsv';
 
-histAll = loadHistograms('joint', 'hsv','');
+histAll = loadHistograms('joint', colorspace,'');
 
-hist_individual = loadHistograms('', 'hsv','');
+hist_individual = loadHistograms('', colorspace,'');
 histoABC = hist_individual{1};
 histoDF = hist_individual{2};
 histoE = hist_individual{3};
@@ -20,10 +21,10 @@ max_c1
 
 if saveHist
     %store histograms
-    save('DataSetDelivered/HistALL_hsv_mod.mat','histAll');
-    save('DataSetDelivered/HistABC_hsv_mod.mat','histoABC');
-    save('DataSetDelivered/HistDF_hsv_mod.mat','histoDF');
-    save('DataSetDelivered/HistE_hsv_mod.mat','histoE');
+    save(['DataSetDelivered/HistALL_',colorspace,'_mod.mat'],'histAll');
+    save(['DataSetDelivered/HistABC_',colorspace,'_mod.mat'],'histoABC');
+    save(['DataSetDelivered/HistDF_',colorspace,'_mod.mat'],'histoDF');
+    save(['DataSetDelivered/HistE_',colorspace,'_mod.mat'],'histoE');
 end
 
 
