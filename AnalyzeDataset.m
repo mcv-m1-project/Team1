@@ -1,13 +1,13 @@
 close all;
 %% OPTIONS
 DATASET_PATH = 'DataSetDelivered';
-FULL_TRAIN_VAL_OPTION = 'full'; % Full (train + validation) dataset, train dataset or validation dataset
+FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
 do_maxmin=1;
 do_formfactor=1;
 do_fillingratio=1;
 plot_FR=1;
-do_freqappearance=1;
-do_signalgrouping=1;
+do_freqappearance=0;
+do_signalgrouping=0;
 
 %% READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
