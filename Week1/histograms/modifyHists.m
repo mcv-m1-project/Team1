@@ -5,7 +5,7 @@ function modifyHists()
 close all
 saveHist = true;
 plotHist = true;
-colorspace = 'lab';
+colorspace = 'hsv';
 
 histAll = loadHistograms('joint', colorspace,'');
 
@@ -17,16 +17,22 @@ histoE = hist_individual{3};
 %Parameters
 histoABC(:,1:5)=0;
 histoABC(10:60,:)=0;
+
 histoDF(:,1:5)=0;
 histoDF(1:20,:)=0;
 histoDF(55:64,:)=0;
+
 histoE(:,1:5)=0;
 histoE(10:20,:)=0;
 histoE(55:60,:)=0;
 
+histAll(:,1:5)=0;
+histAll(10:20,:)=0;
+histAll(55:60,:)=0;
+
 if saveHist
     %store histograms
-    %save(['DataSetDelivered/HistALL_',colorspace,'_mod.mat'],'histAll');
+    save(['DataSetDelivered/HistALL_',colorspace,'_mod.mat'],'histAll');
     save(['DataSetDelivered/HistABC_',colorspace,'_mod.mat'],'histoABC');
     save(['DataSetDelivered/HistDF_',colorspace,'_mod.mat'],'histoDF');
     save(['DataSetDelivered/HistE_',colorspace,'_mod.mat'],'histoE');
