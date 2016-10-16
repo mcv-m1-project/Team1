@@ -1,6 +1,7 @@
 %% OPTIONS
 TRAIN_PERCENTAGE = 70;
 DATASET_PATH = 'DataSetDelivered';
+PLOT_CLUSTERS = 1;
 
 %% READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
@@ -8,7 +9,7 @@ full_dataset = read_train_dataset(TRAIN_DATASET_PATH);
 
 %% COMPUTE TRAIN-VAL SPLIT
 disp('Splitting the dataset in train and validation sets...');
-[train_split, val_split] = compute_train_val_split(full_dataset, TRAIN_PERCENTAGE);
+[train_split, val_split] = compute_train_val_split(full_dataset, TRAIN_PERCENTAGE, PLOT_CLUSTERS);
 
 %% ASSERT THE PERCENTAGE OF ELEMENTS IN EACH SPLIT
 l_train = length(train_split);
