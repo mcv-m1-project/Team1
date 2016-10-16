@@ -14,7 +14,7 @@ histoABC = hist_individual{1};
 histoDF = hist_individual{2};
 histoE = hist_individual{3};
 
-%Parameters
+%% CHANGES
 histoABC(:,1:5)=0;
 histoABC(10:60,:)=0;
 
@@ -30,6 +30,7 @@ histAll(:,1:5)=0;
 histAll(10:20,:)=0;
 histAll(55:60,:)=0;
 
+%%
 if saveHist
     %store histograms
     save(['DataSetDelivered/HistALL_',colorspace,'_mod.mat'],'histAll');

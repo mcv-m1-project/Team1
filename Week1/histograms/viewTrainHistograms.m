@@ -1,4 +1,7 @@
 function viewTrainHistograms(mod)
+%Visualize the existing histograms. 
+%Input parameter mod to be '' for the original histograms or '_mod' for the
+%modified version of the histograms (created with modifyHists)
 close all
 
 histAll = loadHistograms('joint', 'hsv',mod);
