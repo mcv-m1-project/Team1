@@ -90,8 +90,8 @@ histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
 
 if saveHist
-<<<<<<< HEAD
-    %store normalized histograms
+
+    %store histograms
     save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
     save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
     save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
