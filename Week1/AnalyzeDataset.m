@@ -1,13 +1,13 @@
 close all;
 %% OPTIONS
 DATASET_PATH = 'DataSetDelivered';
-FULL_TRAIN_VAL_OPTION = 'val'; % Full (train + validation) dataset, train dataset or validation dataset
-do_maxmin=0;
-do_formfactor=0;
-do_fillingratio=0;
-plot_FR=0;
-do_freqappearance=0;
-do_signalgrouping=0;
+FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
+do_maxmin=1;
+do_formfactor=1;
+do_fillingratio=1;
+plot_FR=1;
+do_freqappearance=1;
+do_signalgrouping=1;
 
 %% READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
@@ -189,7 +189,5 @@ clear area bound_box do_fillingratio do_formfactor do_freqappearance ...
     do_maxmin do_signalgrouping fillratio_vec formFact_vec height i m ...
     mask num_elems type width plotFR nomask
     
-%COLOR SEGMENTATION
-colorSegmentation(train_dataset);
 
 disp('Analysis of training dataset finished.');
