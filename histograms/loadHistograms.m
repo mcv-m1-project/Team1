@@ -3,7 +3,7 @@ function [output_args] = loadHistograms(type, colorspace, modified)
 %signals, one for blue signals and one for red&blue signals)
 %Type: joint or anything else ('' for example)
 %colorspace: 'hsv', 'lab'...
-%modified: 'mod' for modified version, '' for original version
+%modified: '_mod' for modified version, '' for original version
 
 if strcmp(type,'joint')
     name = strcat('DataSetDelivered/HistALL_',colorspace,modified,'.mat');
@@ -15,10 +15,10 @@ else
     output_args{1}=var.histoABC;
     name = strcat('DataSetDelivered/HistDF_',colorspace,modified,'.mat');
     var=load(name);
-    output_args{1}=var.histoDF;
+    output_args{2}=var.histoDF;
     name = strcat('DataSetDelivered/HistE_',colorspace,modified,'.mat');
     var=load(name);
-    output_args{1}=var.histoE;
+    output_args{3}=var.histoE;
 end
 
 end
