@@ -15,18 +15,18 @@ histoDF = hist_individual{2};
 histoE = hist_individual{3};
 
 %% CHANGES
-histoABC(:,1:5)=0;
+histoABC(:,1:20)=0;
 histoABC(10:60,:)=0;
 
-histoDF(:,1:5)=0;
+histoDF(:,1:20)=0;
 histoDF(1:20,:)=0;
 histoDF(55:64,:)=0;
 
-histoE(:,1:5)=0;
+histoE(:,1:20)=0;
 histoE(10:20,:)=0;
 histoE(55:60,:)=0;
 
-histAll(:,1:5)=0;
+histAll(:,1:20)=0;
 histAll(10:20,:)=0;
 histAll(55:60,:)=0;
 
