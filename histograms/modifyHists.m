@@ -3,18 +3,28 @@ function modifyHists()
 %automatic function that modifies a histogram with the input parameters.
 %To make a modification, change the code of this function at your will.
 
-save = false;
+saveHist = false;
 plotHist = true;
 
 histAll = loadHistograms('joint', 'hsv','');
 
 hist_individual = loadHistograms('', 'hsv','');
 histoABC = hist_individual{1};
-histoDF = hist_individual{1};
-histoE = hist_individual{1};
+histoDF = hist_individual{2};
+histoE = hist_individual{3};
 
 %Parameters
 max_c1
+
+
+
+if saveHist
+    %store histograms
+    save('DataSetDelivered/HistALL_hsv_mod.mat','histAll');
+    save('DataSetDelivered/HistABC_hsv_mod.mat','histoABC');
+    save('DataSetDelivered/HistDF_hsv_mod.mat','histoDF');
+    save('DataSetDelivered/HistE_hsv_mod.mat','histoE');
+end
 
 
 if plotHist

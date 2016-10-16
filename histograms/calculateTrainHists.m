@@ -1,6 +1,6 @@
 function calculateTrainHists(colorsp)
 %colorsp= 'lab','hsv'
-
+close all
 DATASET_PATH = 'DataSetDelivered';
 %READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
@@ -81,28 +81,26 @@ edges = {n1; n2};
 
 %calculate the histogram with the 2 first components
 histoABC= hist3([masked_comp_ABC',masked_comp2_ABC'],'Edges', edges);
-histoABC=histoABC/max(max(histoABC));
 
 histoDF= hist3([masked_comp_DF',masked_comp2_DF'],'Edges', edges);
-histoDF=histoDF/max(max(histoDF));
 
 histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
-histoE=histoE/max(max(histoE));
 
 
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
-pdf_normalize = (pdf./ max(max(pdf)));% pdf normalization
 
 if saveHist
+<<<<<<< HEAD
     %store normalized histograms
     save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
     save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
     save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
     save(['DataSetDelivered/HistE_', colorsp, '.mat'],'histoE');
+
 end
 
 if plotHist
-    %plot normalized histograms
+    %plot histograms
     figure('name', 'signal type A, B & C');
     bar3(histoABC)
     xlabel('1st comp'); ylabel('2nd comp');
