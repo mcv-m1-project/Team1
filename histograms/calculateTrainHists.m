@@ -1,4 +1,5 @@
-function calculateTrainHists()
+function calculateTrainHists(colorsp)
+%colorsp= 'lab','hsv'
 
 DATASET_PATH = 'DataSetDelivered';
 %READ DATASET
@@ -7,7 +8,6 @@ TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 [train_split, ~] = read_train_val_split(DATASET_PATH);
 train_dataset = read_train_dataset(TRAIN_DATASET_PATH, train_split);
 
-colorsp = 'hsv';
 saveHist = false;
 plotHist = true;
 
@@ -95,10 +95,10 @@ pdf_normalize = (pdf./ max(max(pdf)));% pdf normalization
 
 if saveHist
     %store normalized histograms
-    save('DataSetDelivered/HistALL_hsv.mat','pdf_normalize');
-    save('DataSetDelivered/HistABC_hsv.mat','histoABC');
-    save('DataSetDelivered/HistDF_hsv.mat','histoDF');
-    save('DataSetDelivered/HistE_hsv.mat','histoE');
+    save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
+    save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
+    save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
+    save(['DataSetDelivered/HistE_', colorsp, '.mat'],'histoE');
 end
 
 if plotHist
@@ -119,7 +119,7 @@ if plotHist
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     figure('name', 'All signal types');
-    bar3(pdf_normalize)
+    bar3(pdf)
     xlabel('1st comp'); ylabel('2nd comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
