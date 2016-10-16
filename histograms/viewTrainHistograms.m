@@ -1,9 +1,9 @@
-function viewTrainHistograms()
+function viewTrainHistograms(mod)
 close all
 
-histAll = loadHistograms('joint', 'hsv','');
+histAll = loadHistograms('joint', 'hsv',mod);
 
-hist_individual = loadHistograms('in', 'hsv','');
+hist_individual = loadHistograms('in', 'hsv',mod);
 histoABC = hist_individual{1};
 histoDF = hist_individual{2};
 histoE = hist_individual{3};

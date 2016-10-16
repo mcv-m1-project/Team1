@@ -15,22 +15,15 @@ histoDF = hist_individual{2};
 histoE = hist_individual{3};
 
 %Parameters
-<<<<<<< Updated upstream
-if (strcmp(colorspace,'hsv'))
-histoABC(:,1:25)=0;
-=======
 histoABC(:,1:5)=0;
->>>>>>> Stashed changes
 histoABC(10:60,:)=0;
-histoDF(:,1:25)=0;
+histoDF(:,1:5)=0;
 histoDF(1:20,:)=0;
 histoDF(55:64,:)=0;
 histoE(:,1:5)=0;
 histoE(10:20,:)=0;
 histoE(55:60,:)=0;
-elseif(strcmp(colorspace,'lab'))
-    histAll(90:110,90:110)=0;
-end
+
 if saveHist
     %store histograms
     %save(['DataSetDelivered/HistALL_',colorspace,'_mod.mat'],'histAll');

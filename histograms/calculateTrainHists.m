@@ -1,5 +1,4 @@
 function calculateTrainHists(colorsp)
-%colorsp= 'lab','hsv'
 close all
 DATASET_PATH = 'DataSetDelivered';
 %READ DATASET
