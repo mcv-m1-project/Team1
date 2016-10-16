@@ -25,7 +25,7 @@ masked_comp2_total=[];
 for i=1: size(train_dataset,2)
     %read image and mask
     im=imread(train_dataset(i).image);
-    mask=imread(train_dataset(i).mask);
+    
     
     %convert to desired color space
     if strcmp(colorsp,'hsv')
@@ -95,7 +95,8 @@ histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
 
 if saveHist
-    % store normalized histograms
+
+    %store histograms
     save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
     save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
     save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
@@ -107,22 +108,22 @@ if plotHist
     %plot histograms
     figure('name', 'signal type A, B & C');
     bar3(histoABC)
-    xlabel('1st comp'); ylabel('2nd comp');
+    xlabel('2nd comp'); ylabel('1st comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     figure('name', 'signal type D & F');
     bar3(histoDF)
-    xlabel('1st comp'); ylabel('2nd comp');
+    xlabel('2nd comp'); ylabel('1st comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     figure('name', 'signal type E');
     bar3(histoE)
-    xlabel('1st comp'); ylabel('2nd comp');
+    xlabel('2nd comp'); ylabel('1st comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     figure('name', 'All signal types');
     bar3(pdf)
-    xlabel('1st comp'); ylabel('2nd comp');
+    xlabel('2nd comp'); ylabel('1st comp');
     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
 end
