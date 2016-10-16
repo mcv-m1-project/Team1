@@ -13,7 +13,8 @@ else
     output_args{1}=var.histoABC;
     var=load(['DataSetDelivered/HistDF_',colorspace,modified,'.mat']);
     output_args{2}=var.histoDF;
-    var=load(['DataSetDelivered/HistE_',colorspace,modified,'.mat']);
+    name = strcat('DataSetDelivered/HistE_',colorspace,modified,'.mat');
+    var=load(name);
     output_args{3}=var.histoE;
 end
 

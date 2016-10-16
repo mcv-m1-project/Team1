@@ -1,9 +1,8 @@
 %
 % Template example for using on the validation set.
-%
-
-function TrafficSignDetection(directory, pixel_method, window_method, decision_method)
-
+% 
+ 
+function TrafficSignDetection(directory, pixel_method, window_method, decision_method, ThresholdRange)
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
     % using a color segmentation. Then, using the color segmentation as a basis, the most likely window 
@@ -47,36 +46,35 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
-    files = ListFiles(directory);
-     histo_total=load('DataSetDelivered/HistALL_lab.mat');
-    histo_total = (histo_total.pdf./ max(max(histo_total.pdf)));% pdf normalization
-            
-    size(histo_total)
-   
+   files = ListFiles(directory);
+   histo_total=load('DataSetDelivered/HistALL_hsv.mat');
+   histo_total=histo_total.pdf;
+   histo_total=histo_total/(max(max(histo_total)));
+   PRC=[];
     tic
    % for i=1:size(files,1)
     
-        [train_split, val_split] = read_train_val_split(directory);
+    [train_split, val_split] = read_train_val_split(directory);
     val_dataset = read_train_dataset([directory '/train/'], val_split);
     size(val_dataset,2)
-    
+    for thr=ThresholdRange
+    pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     for i=1:size(val_dataset,2)
-        i/size(val_dataset,2)*100
         % Read file
-        % im = imread(strcat(directory,'/',files(i).name));
-        im = imread(val_dataset(i).image);
-        
+       % im = imread(strcat(directory,'/',files(i).name));
+      im = imread(val_dataset(i).image);
+     
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method,histo_total);
+        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method,histo_total, thr);
         
         
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
         
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
-        % pixelAnnotation = imread(strcat(directory, '/mask/mask.', files(i).name(1:size(files(i).name,2)-3), 'png'))>0;
-        pixelAnnotation = imread(val_dataset(i).mask)>0;
-        
+       % pixelAnnotation = imread(strcat(directory, '/mask/mask.', files(i).name(1:size(files(i).name,2)-3), 'png'))>0;
+       pixelAnnotation = imread(val_dataset(i).mask)>0;
+      
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
@@ -97,12 +95,19 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity]
     % [windowPrecision, windowAccuracy]
+    pixelRecall=pixelTP/(pixelTP+pixelTN);
+    PRC= [PRC; pixelRecall pixelPrecision];
     %profile report
     %profile off
-toc    
+    
 end
-
-
+plot(PRC(:,1), PRC(:,2), 'b.-')
+axis([0 1 0 1])
+xlabel('Recall')
+ylabel('Precision')
+toc
+end
+ 
 
 
 
@@ -112,7 +117,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_total)
+function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_total,thr)
 
     im=double(im);
     switch space
@@ -121,48 +126,37 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_tota
         case 'hsv'
             %%canviar el colorspace a HSV im_hsv=rgb2hsv(im)
             I=rgb2hsv(im);
-
-          %  pixelCandidates =  (((HueMaxRed>=I(:,:,1) | I(:,:,1) >= HueMinRed) & (I(:,:,2) >= SatMinRed ) & (I(:,:,2) <= SatMaxRed) & (I(:,:,3) >= ValueMinRed ) & (I(:,:,3) <= ValueMaxRed)) | ((I(:,:,1) >= HueMinBlue & I(:,:,1) <= HueMaxBlue)  & (I(:,:,2) >= SatMinBlue ) & (I(:,:,2) <= SatMaxBlue) & (I(:,:,3) >= ValueMinBlue ) & (I(:,:,3) <= ValueMaxBlue)));
-          a=I(:,:,1);
-          b=I(:,:,2);
-          for s1=1:size(im,1)
-            for s2=1:size(im,2)
-                pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > 0.3);
-                %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+            a=I(:,:,1);
+            b=I(:,:,2);
+            for s1=1:size(im,1)
+              for s2=1:size(im,2)
+            pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > thr);
+         %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+              end
             end
-          end
         case 'lab'
              
-         %   I=colorspace('Lab-<',im);
-         colorTransform = makecform('srgb2lab');
-        I = applycform(im, colorTransform);
-       
-           a=I(:,:,2);
-          b=I(:,:,3);
-          for s1=1:size(im,1)
-            for s2=1:size(im,2)
-         %       disp(' a value')
-          %      a(s1,s2)
-           %     disp ('histogram value a')
-            % round((a(s1,s2)+1001)/19.99)+1
-            %  disp(' b value')
-            %  b(s1,s2)
-            %  disp('histogram value b')
-           %  round((b(s1,s2)+1001)/19.99)+1
-          pixelCandidates(s1,s2)= (histo_total(round((a(s1,s2)+201)/1.99)+1,round((b(s1,s2)+201)/1.99)+1) > 0.3);
-       %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+            I=colorspace('Lab-<',im);
+            a=I(:,:,2);
+            b=I(:,:,3);
+            for s1=1:size(im,1)
+              for s2=1:size(im,2)
+                round((a(s1,s2)+ 126)/2)+1
+                round((b(s1,s2)+ 126)/2)+1
+                pixelCandidates(s1,s2)= (histo_total(round((a(s1,s2)+ 126)/2)+1,round((b(s1,s2)+ 126)/2)+1) > thr);
+             %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
+              end
             end
-        end
-    otherwise
-        error('Incorrect color space defined');
-        return
-end
-end
-
+        otherwise
+            error('Incorrect color space defined');
+            return
+    end
+end    
+    
 
 function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
-windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
-end
+    windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
+end  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -172,35 +166,35 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function PerformanceEvaluationROC(scores, labels, thresholdRange)
-% PerformanceEvaluationROC
-%  ROC Curve with precision and accuracy
-
-roc = [];
-for t=thresholdRange,
-    TP=0;
-    FP=0;
-    for i=1:size(scores,1),
-        if scores(i) > t    % scored positive
-            if labels(i)==1 % labeled positive
-                TP=TP+1;
-            else            % labeled negative
-                FP=FP+1;
-            end
-        else                % scored negative
-            if labels(i)==1 % labeled positive
-                FN = FN+1;
-            else            % labeled negative
-                TN = TN+1;
+    % PerformanceEvaluationROC
+    %  ROC Curve with precision and accuracy
+    
+    roc = [];
+	for t=thresholdRange,
+        TP=0;
+        FP=0;
+        for i=1:size(scores,1),
+            if scores(i) > t    % scored positive
+                if labels(i)==1 % labeled positive
+                    TP=TP+1;
+                else            % labeled negative
+                    FP=FP+1;
+                end
+            else                % scored negative
+                if labels(i)==1 % labeled positive
+                    FN = FN+1;
+                else            % labeled negative
+                    TN = TN+1;
+                end
             end
         end
+        
+        precision = TP / (TP+FP+FN+TN);
+        accuracy = TP / (TP+FN+FP);
+        
+        roc = [roc ; precision accuracy];
     end
-    
-    precision = TP / (TP+FP+FN+TN);
-    accuracy = TP / (TP+FN+FP);
-    
-    roc = [roc ; precision accuracy];
-end
 
-plot(roc);
+    plot(roc);
 end
 
