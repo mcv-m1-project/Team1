@@ -46,23 +46,25 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
-    files = ListFiles(directory);
-     histo_total=load('DataSetDelivered/pdf_hsv.mat');
-    histo_total=histo_total.pdf_normalize;
-   
+   files = ListFiles(directory);
+   histo_total=load('DataSetDelivered/pdf_hsv.mat');
+   histo_total=histo_total.pdf_normalize;
+   PRC=[];
     tic
    % for i=1:size(files,1)
     
         [train_split, val_split] = read_train_val_split(directory);
     val_dataset = read_train_dataset([directory '/train/'], val_split);
     size(val_dataset,2)
+    for thr=0:0.1:1
+    pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     for i=1:size(val_dataset,2)
         % Read file
        % im = imread(strcat(directory,'/',files(i).name));
       im = imread(val_dataset(i).image);
      
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method,histo_total);
+        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method,histo_total, thr);
         
         
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,10 +94,17 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity]
     % [windowPrecision, windowAccuracy]
-    
+    pixelRecall=pixelTP/(pixelTP+pixelTN);
+    PRC= [PRC; pixelRecall pixelPrecision]
     %profile report
     %profile off
-    toc
+    
+end
+plot(PRC(:,:,1), PRC(:,:,2), 'b.-')
+axis([0 1 0 1])
+xlabel('Recall')
+ylabel('Precision')
+toc
 end
  
 
@@ -107,7 +116,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_total)
+function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_total,thr)
 
     im=double(im);
     switch space
@@ -144,7 +153,7 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space,histo_tota
           b=I(:,:,2);
           for s1=1:size(im,1)
             for s2=1:size(im,2)
-          pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > 0.3);
+          pixelCandidates(s1,s2)= (histo_total(round(a(s1,s2)*63)+1,round(b(s1,s2)*63)+1) > thr);
        %  pixelCandidates= (histo_total(round(I(:,:,1)*63)+1,round(I(:,:,2)*63)+1) > 0.5);
             end
           end
