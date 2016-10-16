@@ -25,7 +25,7 @@ masked_comp2_total=[];
 for i=1: size(train_dataset,2)
     %read image and mask
     im=imread(train_dataset(i).image);
-    
+    mask=imread(train_dataset(i).mask);
     
     %convert to desired color space
     if strcmp(colorsp,'hsv')
@@ -76,9 +76,9 @@ elseif strcmp(colorsp,'lab')
     %n for LAB
   %  n1=-127:2:127;
  %   n2=-127:2:127;
- n1=-200:2:200;
+ n1=-500:2:500;
  
- n2=-200:2:200;
+ n2=-500:2:500;
 end
 
 %Define the edges of the bins in the histograms
