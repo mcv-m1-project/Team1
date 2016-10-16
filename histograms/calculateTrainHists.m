@@ -25,7 +25,7 @@ masked_comp2_total=[];
 for i=1: size(train_dataset,2)
     %read image and mask
     im=imread(train_dataset(i).image);
-    mask=imread(train_dataset(i).mask);
+    
     
     %convert to desired color space
     if strcmp(colorsp,'hsv')

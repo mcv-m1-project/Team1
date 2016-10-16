@@ -12,7 +12,6 @@ figure('name', 'signal type A, B & C');
 bar3(histoABC)
 xlabel('2nd comp'); ylabel('1st comp');
 set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
-
 figure('name', 'signal type D & F');
 bar3(histoDF)
 xlabel('2nd comp'); ylabel('1st comp');
