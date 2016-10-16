@@ -29,3 +29,6 @@ Run the TrafficSignDetection_test script with the necessary input arguments. For
  - calculateTrainHists(colorsp): where colorsp can be 'hsv' or 'ycrcb'. Set the saveHist and/or plotHist variables to true if you want to store/view the created histograms.
  - viewTrainHistograms(): visualize the available histograms. The input argument should be '' for the original histograms or '\_mod' for the modified version of the histograms.
  - modifyHist(): change the code at your will to modify the histograms (eliminate low-saturated values for example).
+ 
+ - ** Computing masks for validation set **
+ Run the TrafficSignDetection script with the necessary input arguments. For example TrafficSignDetection_test('DataSetDelivered/train','hsv','',''). This function will print Precision, Accuracy Specificity and Sensitivity pixel values.
