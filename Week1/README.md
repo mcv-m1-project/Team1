@@ -34,3 +34,5 @@ Run the TrafficSignDetection_test script with the necessary input arguments. For
  - viewTrainHistograms(): visualize the available histograms. The input argument should be '' for the original histograms or '\_mod' for the modified version of the histograms.
  - modifyHist(): change the code at your will to modify the histograms (eliminate low-saturated values for example).
  
+ 
+ ***If an error is raised when executing TrafficSignDetection or TrafficSignDetection_test, please run the TrainValSplit script, as it is an error in the format of the file depending on the Operating System.
