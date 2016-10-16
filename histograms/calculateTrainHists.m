@@ -90,7 +90,7 @@ histoE= hist3([masked_comp_E',masked_comp2_E'],'Edges', edges);
 pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
 
 if saveHist
-    %store normalized histograms
+    %store histograms
     save('DataSetDelivered/HistALL_hsv.mat','pdf');
     save('DataSetDelivered/HistABC_hsv.mat','histoABC');
     save('DataSetDelivered/HistDF_hsv.mat','histoDF');
@@ -98,7 +98,7 @@ if saveHist
 end
 
 if plotHist
-    %plot normalized histograms
+    %plot histograms
     figure('name', 'signal type A, B & C');
     bar3(histoABC)
     xlabel('1st comp'); ylabel('2nd comp');
