@@ -6,8 +6,8 @@ function [output_args] = loadHistograms(type, colorspace, modified)
 %modified: '_mod' for modified version, '' for original version
 
 if strcmp(type,'joint')
-    var=load(['DataSetDelivered/HistALL_',colorspace,modified,'.mat']);
-    output_args=var.pdf;
+    var=load(['DataSetDelivered/histogram_',colorspace,'.mat']);
+    output_args=var.histAll;
 else
     var=load(['DataSetDelivered/HistABC_',colorspace,modified,'.mat']);
     output_args{1}=var.histoABC;

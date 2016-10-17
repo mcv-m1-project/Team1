@@ -3,7 +3,7 @@
 %
 
 function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method)
-    
+    tic
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
     % using a color segmentation. Then, using the color segmentation as a basis, the most likely window 
@@ -64,15 +64,17 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %Get the selected dataset split
     dataset_split = read_train_dataset([directory '/train/'], set_split);
     
-    %Load histograms
-    hist_individual = loadHistograms('', pixel_method,'_mod');
+    %Load histogram
+    histogram = loadHistograms('joint', pixel_method,'');
+    %Normalize histogram
+    histogram = histogram/max(max(histogram));
     
     for i=1:size(dataset_split,2)
         % Read image
         im = imread(dataset_split(i).image);
         
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, hist_individual);
+        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, histogram);
         
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
@@ -108,7 +110,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     % [windowPrecision, windowAccuracy]
     %profile report
     %profile off
-    
+    toc
 end
 
 
@@ -121,21 +123,13 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histograms)
+function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram)
 
     im=double(im);
     switch space
         case 'normrgb'
             pixelCandidates = im(:,:,1)>100;
         case 'hsv'
-            %%Get the 3 histograms
-            histoABC = histograms{1};
-            histoDF = histograms{2};
-            histoE = histograms{3};
-            %Normalize the histograms
-            histoABC=histoABC./max(max(histoABC));
-            histoDF=histoDF/max(max(histoDF));
-            histoE=histoE/max(max(histoE));
             
             %Initialize result mask
             pixelCandidates=zeros(size(im,1),size(im,2));
@@ -151,7 +145,7 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram
             %histograms)
             for s1=1:size(im,1)
                 for s2=1:size(im,2)
-                    if histoABC(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoDF(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoE(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
+                    if histogram(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
                         pixelCandidates(s1,s2)= 1;
                     end
                 end

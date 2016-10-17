@@ -46,8 +46,10 @@ global SW_STRIDES;         SW_STRIDES = 1.2;
 
 files = ListFiles(input_dir);
 
-%Load histograms
-hist_individual = loadHistograms('', pixel_method,'_mod');
+%Load histogram
+histogram = loadHistograms('joint', pixel_method,'');
+%Normalize histogram
+histogram = histogram/max(max(histogram));
 
 for i=1:size(files,1)
     
@@ -55,7 +57,7 @@ for i=1:size(files,1)
     im = imread(strcat(input_dir,'/',files(i).name));
     
     % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, hist_individual);
+    pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, histogram);
     
     
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,21 +81,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histograms)
+function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram)
 
 im=double(im);
 
 switch space
-    case 'hsv'
-        %Load histograms
-        
-        histoABC = histograms{1};
-        histoDF = histograms{2};
-        histoE = histograms{3};
-        histoABC=histoABC./max(max(histoABC));
-        histoDF=histoDF/max(max(histoDF));
-        histoE=histoE/max(max(histoE));
-        
+    case 'hsv'        
         %Initialize result mask
         pixelCandidates=zeros(size(im,1),size(im,2));
         
@@ -108,7 +101,7 @@ switch space
         %histograms)
         for s1=1:size(im,1)
             for s2=1:size(im,2)
-                if histoABC(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoDF(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1 || histoE(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
+                if histogram(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
                     pixelCandidates(s1,s2)= 1;
                 end
             end
