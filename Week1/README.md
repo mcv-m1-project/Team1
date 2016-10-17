@@ -23,7 +23,7 @@ Note that this computation is not deterministic, as it involves random permutati
  
 - **Computing masks for validation set**
 
-Run the TrafficSignDetection script with the necessary input arguments. For example TrafficSignDetection('DataSetDelivered/train','hsv','',''). This function will print Precision, Accuracy Specificity and Sensitivity pixel values.
+Run the TrafficSignDetection script with the necessary input arguments. For example TrafficSignDetection('DataSetDelivered/','hsv','',''). This function will print Precision, Accuracy Specificity and Sensitivity pixel values.
 
 - **Computing masks for test set**
 
