@@ -1,8 +1,9 @@
-function img=my_imerode(img, se)
+function img_er=my_imerode(img, se)
 
 padx=ceil(size(se,1)/2);
 pady=ceil(size(se,2)/2);
-img=padarray(img,[padx pady], 'replicate');
+img=padarray(img,[padx pady]);
+img_er=img;
 for x=1+padx:size(img,1)-padx
     for y=1+pady:size(img,2)-pady
         min_se=255;
@@ -15,11 +16,11 @@ for x=1+padx:size(img,1)-padx
                 end
             end
         end
-        if img(x,y)>=min_se
-            img(x,y)=min_se;
+        if img(x,y)>min_se
+            img_er(x,y)=min_se;
         end
     end
 end
-img=img(1+padx:size(img,1)-padx, 1+pady:size(img,2)-pady);
+img_er=img_er(1+padx:size(img_er,1)-padx, 1+pady:size(img_er,2)-pady);
             
 end
