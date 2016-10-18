@@ -115,7 +115,6 @@ switch space
         
     otherwise
         error('Incorrect color space defined');
-        return
 end
 end
 
