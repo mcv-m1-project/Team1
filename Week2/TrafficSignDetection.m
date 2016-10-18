@@ -96,7 +96,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         % windowFP = windowFP + localWindowFP;
     end
 
-    % Plot performance evaluation
+    % Performance evaluation
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
     Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
     fprintf('Precision: %f\n', pixelPrecision)
@@ -150,6 +150,7 @@ function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram
                     end
                 end
             end
+            
             
         otherwise
             error('Incorrect color space defined');
