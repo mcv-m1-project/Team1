@@ -48,7 +48,7 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
     files = ListFiles(directory);
-     histo_total=load('DataSetDelivered/HistALL_hsv.mat');
+    histo_total=load('DataSetDelivered/HistALL_hsv.mat');
     histo_total = (histo_total.pdf./ max(max(histo_total.pdf)));% pdf normalization
             
     size(histo_total)
@@ -56,12 +56,12 @@ function TrafficSignDetection(directory, pixel_method, window_method, decision_m
     tic
    % for i=1:size(files,1)
     
-        [train_split, val_split] = read_train_val_split(directory);
+    [train_split, val_split] = read_train_val_split(directory);
     val_dataset = read_train_dataset([directory '/train/'], val_split);
     size(val_dataset,2)
     
     for i=1:size(val_dataset,2)
-        i/size(val_dataset,2)*100
+        disp(i/size(val_dataset,2)*100);
         % Read file
         % im = imread(strcat(directory,'/',files(i).name));
         im = imread(val_dataset(i).image);
