@@ -11,7 +11,7 @@ for x=1+padx:size(img,1)-padx
             i=padx-a;
             for b=1:size(se,2)
                 j=pady-b;
-                if(se(a,b)==1)&&(img(x+i,y+j)>max_se)
+               if(se(a,b)==1)&&(img(x+i,y+j)>max_se)
                     max_se=img(x+i,y+j);
                 end
             end
