@@ -6,8 +6,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     tic
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
-    % using a color segmentation. Then, using the color segmentation as a basis, the most likely window 
-    % candidates to contain a traffic sign are selected using basic features (form factor, filling factor). 
+    % using a color segmentation. Then, using the color segmentation as a basis, the most likely window
+    % candidates to contain a traffic sign are selected using basic features (form factor, filling factor).
     % Finally, a decision is taken on these windows using geometric heuristics (Hough) or template matching.
     %
     %    Parameter name      Value
@@ -32,10 +32,10 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
     % Load models
     %global circleTemplate;
-    %global givewayTemplate;   
-    %global stopTemplate;      
-    %global rectangleTemplate; 
-    %global triangleTemplate;  
+    %global givewayTemplate;
+    %global stopTemplate;
+    %global rectangleTemplate;
+    %global triangleTemplate;
     %
     %if strcmp(decision_method, 'TemplateMatching')
     %   circleTemplate    = load('TemplateCircles.mat');
@@ -47,8 +47,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
     % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
-    
-    
+
+
     [train_split, val_split] = read_train_val_split(directory);
     if strcmp(set, 'train')
         set_split = train_split;
@@ -60,34 +60,34 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         clear train_split val_split
         error('The set type indicated in the input parameters is not valid');
     end
-    
+
     %Get the selected dataset split
     dataset_split = read_train_dataset([directory '/train/'], set_split);
-    
+
     %Load histogram
     histogram = loadHistograms('joint', pixel_method,'');
     %Normalize histogram
     histogram = histogram/max(max(histogram));
-    
+
     for i=1:size(dataset_split,2)
         % Read image
         im = imread(dataset_split(i).image);
-        
+
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, histogram);
-        
+        pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
+
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
-        
+
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
-        
+
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
         pixelFN = pixelFN + localPixelFN;
         pixelTN = pixelTN + localPixelTN;
-        
+
         % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
         % windowAnnotations = LoadAnnotations(strcat(directory, '/gt/gt.', files(i).name(1:size(files(i).name,2)-3), 'txt'));
         % [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
@@ -106,7 +106,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Pixel specificity: %f\n', pixelSpecificity)
 
     % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
-    
+
     % [windowPrecision, windowAccuracy]
     %profile report
     %profile off
@@ -122,42 +122,6 @@ end
 % CandidateGeneration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram)
-
-    im=double(im);
-    switch space
-        case 'normrgb'
-            pixelCandidates = im(:,:,1)>100;
-        case 'hsv'
-            
-            %Initialize result mask
-            pixelCandidates=zeros(size(im,1),size(im,2));
-            
-            %Transform the image to HSV
-            im_cs=rgb2hsv(im);
-            %Take the Hue and Saturation components
-            H=im_cs(:,:,1);
-            S=im_cs(:,:,2);
-            
-            %For each pixel in the test image, check its probability of
-            %belonging to a signal (if its color is represented in the signal
-            %histograms)
-            for s1=1:size(im,1)
-                for s2=1:size(im,2)
-                    if histogram(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
-                        pixelCandidates(s1,s2)= 1;
-                    end
-                end
-            end
-            
-            
-        otherwise
-            error('Incorrect color space defined');
-            return
-    end
-end
-
 
 function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
 windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
@@ -193,13 +157,12 @@ for t=thresholdRange
             end
         end
     end
-    
+
     precision = TP / (TP+FP+FN+TN);
     accuracy = TP / (TP+FN+FP);
-    
+
     roc = [roc ; precision accuracy];
 end
 
 plot(roc);
 end
-

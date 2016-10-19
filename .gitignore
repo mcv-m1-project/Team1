@@ -4,9 +4,9 @@
 # Dataset
 */DataSetDelivered/train
 */DataSetDelivered/test
+DataSetDelivered/train
+DataSetDelivered/test
 
 # MATLAB files
 *.asv
 
-# Past weeks
-Week1
