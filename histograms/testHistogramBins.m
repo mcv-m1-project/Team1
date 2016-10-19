@@ -1,4 +1,4 @@
-function F= testHistogramBins
+function FM= testHistogramBins
 
 %Set TestBins to true if you want to test the system for histograms with
 %different number of bins.
@@ -56,8 +56,9 @@ else
     %Change the values in the for loop to evaluate different configurations
     % 0-percR1 Hue values will be preserved
     % percR2-100% Hue values will be preserved
+    percR1 = 10;
     percR2 = 55;
-    for percR1 = 1:1:4
+    for percR1 = 10
         
         histoABC_ = histoABC;
         histoDF_ = histoDF;
@@ -85,7 +86,7 @@ else
         %threshold that provided these results (the best obtained after testing
         %with thresholds from 0:0.1:1, and the time elapsed in all this computation.
         [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity,...
-            Fmeasure, threshold, time] = calculatePerformance(histAll,Nbins,'val');
+            Fmeasure, threshold, time,FM] = calculatePerformance(histAll,Nbins,'val');
         
         
         
@@ -104,7 +105,7 @@ else
         
         
         
-        F = [F Fmeasure];
+        
         percR1 = 10;
     end
 %     for percR2 = 56:2:64
