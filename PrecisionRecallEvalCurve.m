@@ -40,17 +40,12 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
     %   rectangleTemplate = load('TemplateRectangles.mat');
     %   triangleTemplate  = load('TemplateTriangles.mat');
     %end
-
-    % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
-    pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     
     % Threshold to be iterated
-    th_start = 0.1;
-    th_end = 0.2;
-    N = 2;
-    thresholds = linspace(th_start, th_end, N);
+    thresholds = linspace(0.07, 0.13, 20);
     
     % Variables to store the evaluation scores
+    N = length(thresholds);
     scores = zeros(N, 5);
     
     % Dataset loading
@@ -75,6 +70,8 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
     histogram = histogram/max(max(histogram));
     
     for th_ind=1:length(thresholds)
+        % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
+        pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
         for i=1:size(dataset_split,2)
             % Read image
             im = imread(dataset_split(i).image);
@@ -82,6 +79,9 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
             % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             current_th = thresholds(th_ind);
             pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram, current_th);
+            
+            % Morphological filtering of candidate pixels
+            pixelCandidates = MorphologicalFiltering(pixelCandidates);
 
             % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
@@ -105,8 +105,8 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
 
         % Plot performance evaluation
         [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
-        scores(th_ind, 1:4) = [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity];
-        scores(th_ind, 5) = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+        F_score = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+        scores(th_ind, :) = [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity, F_score];
 
         % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
 
@@ -121,6 +121,6 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
         thresholds, scores(:, 3), thresholds, scores(:, 4), ...
         thresholds, scores(:, 5)), ...
         legend('Precision', 'Accuracy', 'Specificity', 'Sensitivity', 'F1');
-    
+    xlabel('Threshold');
     toc;
 end
