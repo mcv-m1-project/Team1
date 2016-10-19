@@ -59,6 +59,8 @@ for i=1:size(files,1)
     % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, histogram);
     
+    % Morphological filtering of candidate pixels
+    pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)

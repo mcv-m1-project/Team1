@@ -1,10 +1,9 @@
 function [pixelCandidates] = CandidateGenerationPixel(im, space, histogram, threshold)
-    
 
     if nargin < 4
         % Default thresholds
         normrgb_threshold = 100;
-        hsv_threshold = 0.1;
+        hsv_threshold = 0.092;
     else
         normrgb_threshold = threshold;
         hsv_threshold = threshold;
@@ -39,11 +38,5 @@ function [pixelCandidates] = CandidateGenerationPixel(im, space, histogram, thre
         otherwise
             error('Incorrect color space defined');
     end
-    
-    % Morphology operators
-    
-    % TODO
-    
-    
 end
 

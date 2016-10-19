@@ -75,6 +75,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
+        
+        % Morphological filtering of candidate pixels
+        pixelCandidates = MorphologicalFiltering(pixelCandidates);
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
