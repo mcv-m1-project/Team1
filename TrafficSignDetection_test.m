@@ -51,13 +51,15 @@ histogram = loadHistograms('joint', pixel_method,'');
 %Normalize histogram
 histogram = histogram/max(max(histogram));
 
+% Measure time
+tic
 for i=1:size(files,1)
     
     % Read file
     im = imread(strcat(input_dir,'/',files(i).name));
     
     % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    pixelCandidates = CandidateGenerationPixel_Color(im, pixel_method, histogram);
+    pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
     
     % Morphological filtering of candidate pixels
     pixelCandidates = MorphologicalFiltering(pixelCandidates);
@@ -71,7 +73,16 @@ for i=1:size(files,1)
     out_file1 = strcat(output_dir,'/m',files(i).name);
     imwrite (pixelCandidates,out_file1);
     %save (out_file2, 'windowCandidates');
+    
+    % Show progress
+    fprintf('Image %s of %s\r', int2str(i), int2str(size(files,1)));
 end
+
+elapsed_time = toc;
+fprintf('Total time: %s\n', num2str(elapsed_time));
+fprintf('Number of images: %s\n', int2str(size(files, 1)));
+fprintf('Mean time spend on each image: %s s\n', num2str(elapsed_time / size(files,1)));
+
 end
 
 
@@ -82,39 +93,6 @@ end
 % CandidateGeneration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [pixelCandidates] = CandidateGenerationPixel_Color(im, space, histogram)
-
-im=double(im);
-
-switch space
-    case 'hsv'        
-        %Initialize result mask
-        pixelCandidates=zeros(size(im,1),size(im,2));
-        
-        %Transform the image to HSV
-        im_cs=rgb2hsv(im);
-        %Take the Hue and Saturation components
-        H=im_cs(:,:,1);
-        S=im_cs(:,:,2);
-        
-        %For each pixel in the test image, check its probability of
-        %belonging to a signal (if its color is represented in the signal
-        %histograms)
-        for s1=1:size(im,1)
-            for s2=1:size(im,2)
-                if histogram(round(H(s1,s2)*63)+1,round(S(s1,s2)*63)+1) > 0.1
-                    pixelCandidates(s1,s2)= 1;
-                end
-            end
-        end
-        
-    otherwise
-        error('Incorrect color space defined');
-        return
-end
-end
-
 
 function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
 windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
