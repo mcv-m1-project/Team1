@@ -20,8 +20,8 @@ im_dil=imdilate(im(:,:,1),se);
 end
 et_dilation=toc;
 
-disp ('Elapsed time for dilation using our method: %f ',my_et_dilation)
-disp ('Elapsed time for dilation using MATLAB method: %f ',et_dilation)
+disp (['Elapsed time for dilation using our method: ',my_et_dilation])
+disp (['Elapsed time for dilation using MATLAB method: ',et_dilation])
 %% EROSION
 disp ('Calculating performance test on erosion...')
 tic;
@@ -37,8 +37,8 @@ im_dil=imerode(im(:,:,1),se);
 end
 et_erosion=toc;
 
-disp ('Elapsed time for erosion using our method: %f ',my_et_erosion)
-disp ('Elapsed time for erosion using MATLAB method: %f ',et_erosion)
+disp (['Elapsed time for erosion using our method: ',my_et_erosion])
+disp (['Elapsed time for erosion using MATLAB method:  ',et_erosion])
 %%  CLOSING 
 disp ('Calculating performance test on closing...')
 tic;
@@ -54,8 +54,8 @@ im_dil=imclose(im(:,:,1),se);
 end
 et_closing=toc;
 
-disp ('Elapsed time for closing using our method: %f ',my_et_closing)
-disp ('Elapsed time for closing using MATLAB method: %f ',et_closing)
+disp (['Elapsed time for closing using our method: ',my_et_closing])
+disp (['Elapsed time for closing using MATLAB method:',et_closing])
 %% OPENING 
 disp ('Calculating performance test on opening...')
 tic;
@@ -71,8 +71,8 @@ im_dil=imopen(im(:,:,1),se);
 end
 et_opening=toc;
 
-disp ('Elapsed time for opening  using our method: %f ',my_et_opening)
-disp ('Elapsed time for opening using MATLAB method: %f ',et_opening)
+disp (['Elapsed time for opening  using our method:',my_et_opening])
+disp (['Elapsed time for opening using MATLAB method: ',et_opening])
 %% TOP-HAT
 disp ('Calculating performance test on top-hat...')
 tic;
@@ -88,8 +88,8 @@ im_dil=imtophat(im(:,:,1),se);
 end
 et_tophat=toc;
 
-disp ('Elapsed time for top-hat using our method: %f ',my_et_tophat)
-disp ('Elapsed time for top-hat using MATLAB method: %f ',et_tophat)
+disp (['Elapsed time for top-hat using our method: ',my_et_tophat])
+disp (['Elapsed time for top-hat using MATLAB method: ',et_tophat])
 %% BOTTOM-HAT
   disp ('Calculating performance test on bot-hat...')
   tic;
@@ -105,8 +105,8 @@ im_dil=imbothat(im(:,:,1),se);
 end
 et_bothat=toc;
 
-disp ('Elapsed time for bot-hat using our method: %f ',my_et_bothat)
-disp ('Elapsed time for bot-hat using MATLAB method: %f ',et_bothat)
+disp (['Elapsed time for bot-hat using our method:',my_et_bothat])
+disp (['Elapsed time for bot-hat using MATLAB method: ',et_bothat])
 %%
 
 figure;
