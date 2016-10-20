@@ -11,7 +11,7 @@ for x=1+padx:size(img,1)-padx
             i=a-padx;
             for b=1:size(se,2)
                 j=b-pady;
-                if(se(a,b)>0)&&(img(x+i,y+j)<min_se)
+                if(se(a,b)==1)&&(img(x+i,y+j)<min_se)
                     min_se=img(x+i,y+j);
                 end
             end
