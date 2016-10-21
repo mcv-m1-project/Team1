@@ -1,4 +1,4 @@
-function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, decision_method)
+function MorphEvalCurve(directory, set, pixel_method, window_method, decision_method)
     tic
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
@@ -41,11 +41,12 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
     %   triangleTemplate  = load('TemplateTriangles.mat');
     %end
     
-    % Threshold to be iterated
-    thresholds = linspace(0.07, 0.13, 20);
+    % Area opening size and morphological filtering method (1 or 2)
+    ao_size = [400, 450, 500, 550];
+    morph_method = 1;
     
     % Variables to store the evaluation scores
-    N = length(thresholds);
+    N = length(ao_size);
     scores = zeros(N, 5);
     
     % Dataset loading
@@ -69,7 +70,7 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
     %Normalize histogram
     histogram = histogram/max(max(histogram));
     
-    for th_ind=1:length(thresholds)
+    for ao_ind=1:length(ao_size)
         % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
         pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
         for i=1:size(dataset_split,2)
@@ -77,11 +78,11 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
             im = imread(dataset_split(i).image);
 
             % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            current_th = thresholds(th_ind);
-            pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram, current_th);
+            pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
             
             % Morphological filtering of candidate pixels
-            pixelCandidates = MorphologicalFiltering(pixelCandidates);
+            ao_object_size = ao_size(ao_ind);
+            pixelCandidates = MorphologicalFiltering(pixelCandidates, morph_method, ao_object_size);
 
             % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
@@ -106,21 +107,22 @@ function PrecisionRecallEvalCurve(directory, set, pixel_method, window_method, d
         % Plot performance evaluation
         [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
         F_score = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
-        scores(th_ind, :) = [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity, F_score];
+        scores(ao_ind, :) = [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity, F_score];
 
         % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
 
         % [windowPrecision, windowAccuracy]
         %profile report
         %profile off
-        fprintf('Ended iteration %s of %s\n', int2str(th_ind), int2str(N));
+        fprintf('Ended iteration %s of %s\n', int2str(ao_ind), int2str(N));
     end
     
     % Plot curves
-    plot(thresholds, scores(:, 1), thresholds, scores(:, 2), ...
-        thresholds, scores(:, 3), thresholds, scores(:, 4), ...
-        thresholds, scores(:, 5)), ...
+    plot(ao_size, scores(:, 1), ao_size, scores(:, 2), ...
+        ao_size, scores(:, 3), ao_size, scores(:, 4), ...
+        ao_size, scores(:, 5)), ...
         legend('Precision', 'Accuracy', 'Specificity', 'Sensitivity', 'F1');
-    xlabel('Threshold');
+    xlabel('Area opening object size');
     toc;
 end
+
