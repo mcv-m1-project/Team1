@@ -1,4 +1,5 @@
-function FM= testHistogramBins
+function [Fmeasure_max, pixelPrecision_max, pixelAccuracy_max,...
+    pixelSpecificity_max, pixelSensitivity_max ] = testHistogramBins
 
 %Set TestBins to true if you want to test the system for histograms with
 %different number of bins.
@@ -45,39 +46,41 @@ else
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Nbins = 64;
     perc =0;
-    Fmeasure_max=0;
-    pixelPrecision_max=0; pixelAccuracy_max=0; pixelSpecificity_max=0; pixelSensitivity_max=0;
+    Fmeasure_max=[];
+    pixelPrecision_max=[]; pixelAccuracy_max=[]; pixelSpecificity_max=[]; pixelSensitivity_max=[];
     F=[];
     %Compute a HS histogram of the train split of the dataset with
     %64x64 bins and no deleted grays
     [histoABC,histoDF,histoE] = calculateTrainHists('hsv',Nbins,perc,false);
     
-    perc = 0.1;
     %Change the values in the for loop to evaluate different configurations
     % 0-percR1 Hue values will be preserved
     % percR2-100% Hue values will be preserved
     percR1 = 10;
     percR2 = 55;
-    for percR1 = 10
+    percB1 = 35;
+    percB2 = 50;
+    for i = 1
+        for perc = 1:1:30
         
         histoABC_ = histoABC;
         histoDF_ = histoDF;
         histoE_ = histoE;
         
         % %Eliminate a 'perc' percentage of the low-saturated values
-        histoABC_(:,1:round(perc*Nbins))=0;
-        histoDF_(:,1:round(perc*Nbins))=0;
-        histoE_(:,1:round(perc*Nbins))=0;
+        histoABC_(:,1:perc)=0;
+        histoDF_(:,1:perc)=0;
+        histoE_(:,1:perc)=0;
         
         %Eliminate non-red (8%-85%)or non-blue(0-55%,65%-100) values
         histoABC_(percR1:percR2,:)=0;
         
-        histoDF_(1:round(0.55*Nbins),:)=0;
-        histoDF_(round(0.65*Nbins):Nbins,:)=0;
+        histoDF_(1:percB1,:)=0;
+        histoDF_(percB2:Nbins,:)=0;
         
         %Eliminate non-red or non-blue values(8%-55%,65%-85%)
-        histoE_(percR1:round(0.55*Nbins),:)=0;
-        histoE_(round(0.65*Nbins):percR2,:)=0;
+        histoE_(percR1:percB1,:)=0;
+        histoE_(percB2:percR2,:)=0;
         
         histAll = histoABC_+histoDF_+histoE_;
         
@@ -103,10 +106,13 @@ else
         fprintf('Pixel specificity: %f\n', pixelSpecificity)
         fprintf('Time elapsed in calculatePerformance: %f\n\n', time)
         
+        Fmeasure_max = [Fmeasure_max Fmeasure];
+        pixelPrecision_max = [pixelPrecision_max pixelPrecision];
+        pixelAccuracy_max = [pixelAccuracy_max pixelAccuracy];
+        pixelSpecificity_max= [pixelSpecificity_max pixelSpecificity];
+        pixelSensitivity_max = [pixelSensitivity_max pixelSensitivity];
         
-        
-        
-        percR1 = 10;
+        end
     end
 %     for percR2 = 56:2:64
 %         

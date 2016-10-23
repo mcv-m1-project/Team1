@@ -1,13 +1,13 @@
 close all;
 %% OPTIONS
 DATASET_PATH = 'DataSetDelivered';
-FULL_TRAIN_VAL_OPTION = 'train'; % Full (train + validation) dataset, train dataset or validation dataset
-do_maxmin=1;
-do_formfactor=1;
-do_fillingratio=1;
-plot_FR=1;
-do_freqappearance=1;
-do_signalgrouping=1;
+FULL_TRAIN_VAL_OPTION = 'full'; % Full (train + validation) dataset, train dataset or validation dataset
+do_maxmin=0;
+do_formfactor=0;
+do_fillingratio=0;
+plot_FR=0;
+do_freqappearance=0;
+do_signalgrouping=0;
 
 %% READ DATASET
 TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
@@ -63,6 +63,7 @@ disp('');
 dataset_length = length(train_dataset);
 hold on;
 axis([0.4 1.1 0 7]);
+cnt = 0;
 for i=1:dataset_length
     %Get the information from the ground truth
     [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
@@ -76,8 +77,11 @@ for i=1:dataset_length
  
         %If there is no signal in the bounding box (any pixel in the
         %mask==1), we go onto the next signal
-        if nnz(mask(bound_box(1):bound_box(1)+height, ...
-                bound_box(2):bound_box(2)+width))==0
+        if nnz(mask(bound_box(m,1):bound_box(m,1)+height, ...
+                bound_box(m,2):bound_box(m,2)+width))==0
+            train_dataset(i).name
+            bound_box
+            cnt = cnt+1
             if size(nomask,1)==0 
                 nomask=[nomask;train_dataset(i).name];
             elseif nomask(end)~=train_dataset(i).name

@@ -1,4 +1,4 @@
-function [histoABC,histoDF,histoE,histAll] = calculateTrainHists(colorsp,Nbins,perc,deletegrays)
+function [histoABC,histoDF,histoE,histAll,cntR,cntB,cntRB] = calculateTrainHists(colorsp,Nbins,perc,deletegrays)
 close all
 DATASET_PATH = 'DataSetDelivered';
 %READ DATASET
@@ -7,8 +7,8 @@ TRAIN_DATASET_PATH = fullfile(DATASET_PATH, 'train');
 [train_split, ~] = read_train_val_split(DATASET_PATH);
 train_dataset = read_train_dataset(TRAIN_DATASET_PATH, train_split);
 
-saveHist = false;
-plotHist = false;
+saveHist = true;
+plotHist = true;
 
 masked_comp_ABC=[];
 masked_comp_DF=[];
@@ -20,6 +20,9 @@ masked_comp2_DF=[];
 masked_comp2_E=[];
 masked_comp2_total=[];
 
+cntR = 0;
+cntB = 0;
+cntRB = 0;
 
 for i=1: size(train_dataset,2)
     %read image and mask
@@ -50,13 +53,16 @@ for i=1: size(train_dataset,2)
         if type{it}==1 || type{it}==2 || type{it}==3
             masked_comp_ABC=[masked_comp_ABC, comp(logical(mask))'];
             masked_comp2_ABC=[masked_comp2_ABC, comp2(logical(mask))'];
+            cntR = cntR+1;
             
         elseif  type{it}==4 || type{it}==6
             masked_comp_DF=[masked_comp_DF, comp(logical(mask))'];
             masked_comp2_DF=[masked_comp2_DF, comp2(logical(mask))'];
+            cntB = cntB+1;
         elseif  type{it}==5
             masked_comp_E=[masked_comp_E, comp(logical(mask))'];
             masked_comp2_E=[masked_comp2_E, comp2(logical(mask))'];
+            cntRB = cntRB+1;
         end
         
         masked_comp_total=[masked_comp_total, comp(logical(mask))'];
@@ -102,6 +108,10 @@ if deletegrays == true
 
 end
 
+histoABC = histoABC / cntR;
+histoDF = histoDF / cntB;
+histoE = histoE / cntRB;
+
 histAll = histoABC+histoDF+histoE;
 
 %pdf=hist3([masked_comp_total' , masked_comp2_total'],'Edges',edges);
@@ -109,10 +119,10 @@ histAll = histoABC+histoDF+histoE;
 if saveHist
 
     %store histograms
-    %save(['DataSetDelivered/HistALL_', colorsp, '.mat'],'pdf');
-    save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
-    save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
-    save(['DataSetDelivered/HistE_', colorsp, '.mat'],'histoE');
+    save(['DataSetDelivered/histogram_', colorsp, '.mat'],'histAll');
+    %save(['DataSetDelivered/HistABC_', colorsp, '.mat'],'histoABC');
+    %save(['DataSetDelivered/HistDF_', colorsp, '.mat'],'histoDF');
+    %save(['DataSetDelivered/HistE_', colorsp, '.mat'],'histoE');
 
 end
 

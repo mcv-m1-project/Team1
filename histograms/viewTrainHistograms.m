@@ -11,6 +11,7 @@ histoABC = hist_individual{1};
 histoDF = hist_individual{2};
 histoE = hist_individual{3};
 
+histAll = histoABC + histoE + histoDF;
 figure('name', 'signal type A, B & C');
 bar3(histoABC)
 xlabel('2nd comp'); ylabel('1st comp');

@@ -49,7 +49,7 @@ files = ListFiles(input_dir);
 %Load histogram
 histogram = loadHistograms('joint', pixel_method,'');
 %Normalize histogram
-histogram = histogram/max(max(histogram));
+%histogram = histogram/max(max(histogram));
 
 % Measure time
 tic
