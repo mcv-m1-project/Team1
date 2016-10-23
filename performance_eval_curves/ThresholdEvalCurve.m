@@ -42,7 +42,8 @@ function ThresholdEvalCurve(directory, set, pixel_method, window_method, decisio
     %end
     
     % Threshold to be iterated
-    thresholds = linspace(0.05, 0.2, 20);
+    
+    thresholds = linspace(0, 0.5, 5); 
     
     % Variables to store the evaluation scores
     N = length(thresholds);
@@ -64,10 +65,17 @@ function ThresholdEvalCurve(directory, set, pixel_method, window_method, decisio
     %Get the selected dataset split
     dataset_split = read_train_dataset([directory '/train/'], set_split);
     
+    
     %Load histogram
-    histogram = loadHistograms('joint', pixel_method,'');
+    %histogram = loadHistograms('joint', pixel_method,'');
     %Normalize histogram
-    histogram = histogram/max(max(histogram));
+    %histogram = histogram/max(max(histogram));
+    
+    %Load model histogram
+    histogram = loadHistograms('joint', pixel_method,'');
+
+
+
     
     for th_ind=1:length(thresholds)
         % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
@@ -75,7 +83,7 @@ function ThresholdEvalCurve(directory, set, pixel_method, window_method, decisio
         for i=1:size(dataset_split,2)
             % Read image
             im = imread(dataset_split(i).image);
-
+ 
             % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             current_th = thresholds(th_ind);
             pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram, current_th);
