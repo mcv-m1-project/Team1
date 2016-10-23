@@ -47,7 +47,7 @@ switch space
         
         if strcmp(normmethod, 'paper')
             %Eliminate low saturated values from the model histogram
-            grays = 40;
+            grays = 30;
             histogram(:,1:grays)=0;
             
             %Reshape H & S into vectors
