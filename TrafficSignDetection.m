@@ -45,7 +45,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %   triangleTemplate  = load('TemplateTriangles.mat');
     %end
 
-    % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
+    windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
 
 
@@ -80,11 +80,10 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelCandidates = MorphologicalFiltering(pixelCandidates);
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
 
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
-
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
@@ -92,80 +91,31 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelTN = pixelTN + localPixelTN;
 
         % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
-        % windowAnnotations = LoadAnnotations(strcat(directory, '/gt/gt.', files(i).name(1:size(files(i).name,2)-3), 'txt'));
-        % [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
-        % windowTP = windowTP + localWindowTP;
-        % windowFN = windowFN + localWindowFN;
-        % windowFP = windowFP + localWindowFP;
+        windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
+        [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
+        windowTP = windowTP + localWindowTP;
+        windowFN = windowFN + localWindowFN;
+        windowFP = windowFP + localWindowFP;
     end
 
     % Performance evaluation
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
     Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+    fprintf('PIXEL-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
     fprintf('Precision: %f\n', pixelPrecision)
     fprintf('Recall: %f\n', pixelSensitivity)
-    fprintf('F measure: %f\n', Fmeasure)
-    fprintf('Pixel accuracy: %f\n', pixelAccuracy)
-    fprintf('Pixel specificity: %f\n', pixelSpecificity)
+    fprintf('Accuracy: %f\n', pixelAccuracy)
+    fprintf('Specificity: %f\n', pixelSpecificity)
+    fprintf('F measure: %f\n\n', Fmeasure)
 
-    % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
+    [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
 
-    % [windowPrecision, windowAccuracy]
+    fprintf('REGION-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
+    fprintf('Precision: %f\n', windowPrecision)
+    fprintf('Accuracy: %f\n', windowAccuracy)
     %profile report
     %profile off
     toc
-end
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CandidateGeneration
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
-windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
-end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Performance Evaluation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function PerformanceEvaluationROC(scores, labels, thresholdRange)
-% PerformanceEvaluationROC
-%  ROC Curve with precision and accuracy
-
-roc = [];
-for t=thresholdRange
-    TP=0;
-    FP=0;
-    for i=1:size(scores,1)
-        if scores(i) > t    % scored positive
-            if labels(i)==1 % labeled positive
-                TP=TP+1;
-            else            % labeled negative
-                FP=FP+1;
-            end
-        else                % scored negative
-            if labels(i)==1 % labeled positive
-                FN = FN+1;
-            else            % labeled negative
-                TN = TN+1;
-            end
-        end
-    end
-
-    precision = TP / (TP+FP+FN+TN);
-    accuracy = TP / (TP+FN+FP);
-
-    roc = [roc ; precision accuracy];
-end
-
-plot(roc);
 end
