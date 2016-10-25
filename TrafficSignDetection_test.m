@@ -65,14 +65,15 @@ for i=1:size(files,1)
     pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
-    
+    windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
     
     %out_file1 = sprintf ('%s/test/pixelCandidates.mat',  output_dir);
     %out_file1 = sprintf ('%s/test/windowCandidates.mat', output_dir);
-    out_file1 = strcat(output_dir,'/m',files(i).name);
+    out_file = strcat(output_dir,'/m',files(i).name);
+    out_file1 = strrep(out_file, 'jpg', 'png');
+    out_file2 = strrep(out_file, 'jpg', 'mat');
     imwrite (pixelCandidates,out_file1);
-    %save (out_file2, 'windowCandidates');
+    save(out_file2, 'windowCandidates');
     
     % Show progress
     fprintf('Image %s of %s\r', int2str(i), int2str(size(files,1)));
@@ -83,17 +84,4 @@ fprintf('Total time: %s\n', num2str(elapsed_time));
 fprintf('Number of images: %s\n', int2str(size(files, 1)));
 fprintf('Mean time spend on each image: %s s\n', num2str(elapsed_time / size(files,1)));
 
-end
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CandidateGeneration
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
-windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
 end
