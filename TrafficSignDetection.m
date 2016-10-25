@@ -96,6 +96,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         windowTP = windowTP + localWindowTP;
         windowFN = windowFN + localWindowFN;
         windowFP = windowFP + localWindowFP;
+        
+        % Show progress
+        fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
     end
 
     % Performance evaluation
