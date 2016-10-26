@@ -82,6 +82,13 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
 
+%         imshow(pixelCandidates);
+%         hold on;
+%         for ind=1:size(windowCandidates, 1)
+%             f = rectangle('Position', [windowCandidates(ind).x, windowCandidates(ind).y, windowCandidates(ind).w, windowCandidates(ind).h], 'EdgeColor', 'r');
+%         end
+%         waitfor(f);
+        
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
@@ -112,11 +119,12 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Specificity: %f\n', pixelSpecificity)
     fprintf('F measure: %f\n\n', Fmeasure)
 
-    [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
+    [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
 
     fprintf('REGION-BASED EVALUATION\n')
     fprintf('-----------------------\n')
     fprintf('Precision: %f\n', windowPrecision)
+    fprintf('Recall: %f\n', windowRecall)
     fprintf('Accuracy: %f\n', windowAccuracy)
     %profile report
     %profile off
