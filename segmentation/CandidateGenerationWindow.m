@@ -35,12 +35,29 @@ for i=1:size(windowCandidates,1)
     end
 end
 windowCandidates(del,:)=[];
+
+% Window candidates post-filtering
+if ~strcmp(window_method, 'ccl')
+    keep=[];
+    N = size(windowCandidates, 1);
+    for ind=1:N
+        bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
+                min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
+                min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
+        fr = filling_ratio(bbox, pixelCandidates);
+        f_factor = form_factor(bbox);
+        if ((fr>0.47 && fr<0.53) || (fr>0.77 && fr<0.83) || (fr>0.97 && fr<1.05)) && (f_factor > 0.5 && f_factor < 1.5)
+            keep = [keep ind];
+        end
+    end
+    windowCandidates = windowCandidates(keep, :);
+end
+
+% Window candidates transformation to struct
 windowCandidatesFinal=[];
 for i=1:size(windowCandidates,1)
     box_struct = struct('x', windowCandidates(i,1), 'y', windowCandidates(i,2), 'w', windowCandidates(i,3), 'h', windowCandidates(i,4));
     windowCandidatesFinal=[windowCandidatesFinal; box_struct];
-    
 end
-% TODO: mean, union, intersection, etc.
 
 end
