@@ -87,7 +87,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 %         for ind=1:size(windowCandidates, 1)
 %             f = rectangle('Position', [windowCandidates(ind).x, windowCandidates(ind).y, windowCandidates(ind).w, windowCandidates(ind).h], 'EdgeColor', 'r');
 %         end
-%         waitfor(f);
+%         if size(windowCandidates, 1) > 0
+%             waitfor(f);
+%         end
         
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
