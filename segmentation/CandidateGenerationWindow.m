@@ -36,7 +36,7 @@ for i=1:size(windowCandidates,1)
 end
 windowCandidates(del,:)=[];
 
-% Window candidates post-filtering
+%Window candidates post-filtering
 if ~strcmp(window_method, 'ccl')
     keep=[];
     N = size(windowCandidates, 1);
@@ -44,9 +44,10 @@ if ~strcmp(window_method, 'ccl')
         bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
                 min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
                 min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
-        fr = filling_ratio(bbox, pixelCandidates);
+        %fr = filling_ratio(bbox, pixelCandidates);
         f_factor = form_factor(bbox);
-        if ((fr>0.47 && fr<0.53) || (fr>0.77 && fr<0.83) || (fr>0.97 && fr<1.05)) && (f_factor > 0.5 && f_factor < 1.5)
+        %if ((fr>0.47 && fr<0.53) || (fr>0.77 && fr<0.83) || (fr>0.97 && fr<1.05)) && (f_factor > 0.5 && f_factor < 1.5)
+        if (f_factor > 0.5 && f_factor < 2)
             keep = [keep ind];
         end
     end
