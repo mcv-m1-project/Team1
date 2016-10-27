@@ -2,8 +2,8 @@ function [ windowCandidates ] = SlidingWindow( im, pixelCandidates )
 %SLIDINGWINDOW Summary of this function goes here
 %   Detailed explanation goes here
 
-window_maxsize = 235;
-window_minsize = 45;
+window_maxsize = 230;
+window_minsize = 30;
 windowCandidates = [];
 xmin = 16000;
 ymin = 16000;
@@ -27,8 +27,13 @@ for id=1:4
         x_range=ceil(x/2)+1:x;
         y_range=ceil(y/2)+1:y;
     end
-    total_operations = 0;
+    %total_operations = 0;
+    
+    %Discarting 'black-blocks' of the image 
     if nnz(pixelCandidates(y_range, x_range))
+        %Finding the minimum and maximum position of "whites" in the image
+        %to slide the window inside this part, instead of slide the window 
+        %through the entire image.
         for a=x_range
             for b=y_range
                 if pixelCandidates(b,a)==1
@@ -64,6 +69,7 @@ for id=1:4
                     col_left=pixelCandidates(j:j+winy,i);
                     row_down=pixelCandidates(j+winy, i:i+winy);
                     if nnz(row_up) && nnz(col_left) && nnz(row_down)
+                    %if nnz(col_left) && nnz(row_down)
                         if ((fr>0.47 && fr<0.53) || (fr>0.77 && fr<0.83) || (fr>0.97 && fr<1.05))
                             %box_struct = struct('x', i, 'y', j, 'w', winx, 'h', winy);
                             %windowCandidates=[windowCandidates; box_struct];

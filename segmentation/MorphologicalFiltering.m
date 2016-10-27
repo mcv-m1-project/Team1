@@ -52,7 +52,7 @@ switch(method)
 
     case 3 
      %    SE = strel('diamond', strel_R);
-        SE_close=strel('disk',7);
+        SE_close=strel('rectangle',[7,3]);
         SE2=strel('square', 5 );
         SE_th=strel('square', 250);
         
