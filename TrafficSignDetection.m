@@ -4,6 +4,8 @@
 
 function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method)
     tic
+    close all;
+
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
     % using a color segmentation. Then, using the color segmentation as a basis, the most likely window
@@ -69,7 +71,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %Normalize histogram
     histogram = histogram/max(max(histogram));
 
-    for i=1:size(dataset_split,2)
+    for i=1: size(dataset_split,2)
+         fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
         im = imread(dataset_split(i).image);
 
