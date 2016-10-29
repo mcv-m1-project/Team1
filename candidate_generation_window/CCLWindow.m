@@ -7,7 +7,8 @@ stats = regionprops(CC, 'BoundingBox');
 N = length(stats);
 windowCandidates = zeros(N, 4);
 for m=1:N
-    windowCandidates(m, :) = ceil(stats(m).BoundingBox);
+     bbox = ceil(stats(m).BoundingBox);
+    windowCandidates(m, :) = bbox;
 end
 
 end
