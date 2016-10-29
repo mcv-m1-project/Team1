@@ -5,41 +5,41 @@ function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates
 switch(window_method)
     case 'ccl'
         windowCandidates = CCLWindow(im, pixelCandidates);
-        windowCandidates = candidatesArbitration(windowCandidates);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method);
     case {'naive_window', 'integral_window' }
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
-        windowCandidates = candidatesArbitration(windowCandidates);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method);
     case 'convolution'
         
         [mask,split] = splitMask(pixelCandidates);
         
         if split == 0
             %Image is empty
-            windowCandidates = candidatesArbitration([]);
+            windowCandidates = candidatesArbitration([],window_method);
         else
             [r,c] = size(pixelCandidates);
-    
+
             %Look for triangles
             windowCandidatesT = ConvSlidingWindow(mask,split,r,c,'tri');
-            windowCandidates = candidatesArbitration(windowCandidatesT);
+            windowCandidates = candidatesArbitration(windowCandidatesT,window_method);
     
             %Look for circles
             windowCandidatesC = ConvSlidingWindow(mask,split,r,c,'circ');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesC)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesC,window_method)];
    
             %Look for inverted triangles
             windowCandidatesIT = ConvSlidingWindow(mask,split,r,c,'invtri');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesIT)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesIT,window_method)];
 
             %Look for rectangles/squares
             windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
         
     otherwise
         % Default method: Connected Components Labeling
         windowCandidates = CCLWindow(im, pixelCandidates); 
-        windowCandidates = candidatesArbitration(windowCandidates);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method);
 end
 
 
@@ -67,7 +67,7 @@ end
 
 end
 
-function windCandidates = candidatesArbitration(windowCandidates)
+function windCandidates = candidatesArbitration(windowCandidates,window_method)
 % Window candidates arbitration
 del=[];
 for i=1:size(windowCandidates,1)
