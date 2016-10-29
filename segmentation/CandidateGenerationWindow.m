@@ -5,10 +5,10 @@ function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates
 switch(window_method)
     case 'ccl'
         windowCandidates = CCLWindow(im, pixelCandidates);
-    case 'naive_window'
-        windowCandidates = SlidingWindow(im, pixelCandidates);
-    case 'integral_window'
-        windowCandidates = IntegralSlidingWindow(im, pixelCandidates);
+    case {'naive_window', 'integral_window' }
+        windowCandidates = SlidingWindow(im, pixelCandidates,window_method);
+  %  case 'integral_window'
+   %     windowCandidates = IntegralSlidingWindow(im, pixelCandidates);
     case 'convolution'
         windowCandidates = ConvSlidingWindow(im, pixelCandidates);
     otherwise
