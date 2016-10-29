@@ -69,14 +69,29 @@ for i=1:size(files,1)
     
     %out_file1 = sprintf ('%s/test/pixelCandidates.mat',  output_dir);
     %out_file1 = sprintf ('%s/test/windowCandidates.mat', output_dir);
-    out_file = strcat(output_dir,'/m',files(i).name);
-    out_file1 = strrep(out_file, 'jpg', 'png');
-    out_file2 = strrep(out_file, 'jpg', 'mat');
-    imwrite (pixelCandidates,out_file1);
-    save(out_file2, 'windowCandidates');
+    %out_file = strcat(output_dir,'/m',files(i).name);
+    %out_file1 = strrep(out_file, 'jpg', 'png');
+    %out_file2 = strrep(out_file, 'jpg', 'mat');
+    %imwrite (pixelCandidates,out_file1);
+    %save(out_file2, 'windowCandidates');
     
     % Show progress
     fprintf('Image %s of %s\r', int2str(i), int2str(size(files,1)));
+    
+    
+        hAx  = axes;
+        imshow(pixelCandidates,'Parent', hAx);
+         for zz = 1:size(windowCandidates,1)
+             %f = figure(1);
+             %hAx  = axes;
+             %imshow(pixelCandidates,'Parent', hAx);
+             r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+             setColor(r,'r');
+             %uiwait(f)
+         end
+         out_file = strcat(output_dir,'/m',files(i).name,'.png');
+         print(out_file,'-dpng')
+         
 end
 
 elapsed_time = toc;

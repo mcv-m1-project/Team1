@@ -71,28 +71,20 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %Normalize histogram
     histogram = histogram/max(max(histogram));
 
-    for i=1: size(dataset_split,2)
+    for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
         im = imread(dataset_split(i).image);
 
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
+        pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram);
         
         % Morphological filtering of candidate pixels
-        pixelCandidates = MorphologicalFiltering(pixelCandidates);
+        pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
 
-%         imshow(pixelCandidates);
-%          hold on;
-%          for ind=1:size(windowCandidates, 1)
-%              f = rectangle('Position', [windowCandidates(ind).x, windowCandidates(ind).y, windowCandidates(ind).w, windowCandidates(ind).h], 'EdgeColor', 'r');
-%          end
-%          if size(windowCandidates, 1) > 0
-%              waitfor(f);
-%          end
         
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
@@ -108,9 +100,24 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         windowTP = windowTP + localWindowTP;
         windowFN = windowFN + localWindowFN;
         windowFP = windowFP + localWindowFP;
+        out_file = strcat('valseg','/m',int2str(i),'.png');
+        out_file1 = strcat('valsegM','/m',int2str(i),'.png');
+        
+        imwrite (pixelCandidates1,out_file);
+        imwrite (pixelCandidates,out_file1);
         
         % Show progress
         fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
+
+        hAx  = axes;
+        imshow(pixelCandidates,'Parent', hAx);
+         for zz = 1:size(windowCandidates,1)
+             r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+             setColor(r,'r');
+         end
+         %out_file = strcat('valsegA6','/m',int2str(i),'.png');
+         %print(out_file,'-dpng')
+ 
     end
 
     % Performance evaluation
@@ -131,6 +138,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Precision: %f\n', windowPrecision)
     fprintf('Recall: %f\n', windowRecall)
     fprintf('Accuracy: %f\n', windowAccuracy)
+
+    
     %profile report
     %profile off
     toc
