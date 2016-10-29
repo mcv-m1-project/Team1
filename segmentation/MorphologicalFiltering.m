@@ -11,7 +11,7 @@ DEFAULT_AO_SIZE_1 = 300;
 % DEFAULT AREA OPENING OBJECT SIZE (METHOD 2)
 DEFAULT_AO_SIZE_2 = 5000;
 % DEFAULT METHOD
-DEFAULT_METHOD = 3;
+DEFAULT_METHOD = 4;
 
 
 
@@ -63,22 +63,27 @@ switch(method)
         
     case 4
         
-        SE = strel('disk', 3);
+        SE = strel('line', 15,60);
         pixelCandidates = imclose(pixelCandidates, SE);
-        SE = strel('line', 4,0);
+        SE = strel('line', 15,120);
         pixelCandidates = imclose(pixelCandidates, SE);
-        SE = strel('line', 1,90);
+        SE = strel('line', 10,0);
         pixelCandidates = imclose(pixelCandidates, SE);
         
-        pixelCandidates = imfill(pixelCandidates,'holes');
+        SE = strel('line', 10,-60);
+        pixelCandidates = imclose(pixelCandidates, SE);
+        SE = strel('line', 10,-120);
+        pixelCandidates = imclose(pixelCandidates, SE);
+        
+        
+        
+        pixelCandidates = imfill(pixelCandidates, 'holes');
+        %SE = strel('disk', 4);
+        %pixelCandidates = imopen(pixelCandidates, SE);
         
         pixelCandidates = bwareaopen(pixelCandidates, 600,4);
-        
-        SE = strel('disk', 6);
-        pixelCandidates = imclose(pixelCandidates, SE);
-        pixelCandidates = imfill(pixelCandidates,'holes');
-        pixelCandidates = bwareaopen(pixelCandidates, 700,4);
-        
+        pixelCandidates= pixelCandidates & ~bwareaopen(pixelCandidates,80000);
+
     otherwise
         error('You must specify one of the two following methods: 1, 2, 3');
 end
