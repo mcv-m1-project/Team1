@@ -5,35 +5,43 @@ function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates
 switch(window_method)
     case 'ccl'
         windowCandidates = CCLWindow(im, pixelCandidates);
+        windowCandidates = candidatesArbitration(windowCandidates);
     case {'naive_window', 'integral_window' }
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
+        windowCandidates = candidatesArbitration(windowCandidates);
     case 'convolution'
-        windowCandidates = ConvSlidingWindow(im, pixelCandidates);
+        
+        [mask,split] = splitMask(pixelCandidates);
+        
+        if split == 0
+            %Image is empty
+            windowCandidates = candidatesArbitration([]);
+        else
+            [r,c] = size(pixelCandidates);
+    
+            %Look for triangles
+            windowCandidatesT = ConvSlidingWindow(mask,split,r,c,'tri');
+            windowCandidates = candidatesArbitration(windowCandidatesT);
+    
+            %Look for circles
+            windowCandidatesC = ConvSlidingWindow(mask,split,r,c,'circ');
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesC)];
+   
+            %Look for inverted triangles
+            windowCandidatesIT = ConvSlidingWindow(mask,split,r,c,'invtri');
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesIT)];
+
+            %Look for rectangles/squares
+            windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR)];
+        end
+        
     otherwise
         % Default method: Connected Components Labeling
-        windowCandidates = CCLWindow(im, pixelCandidates);     
+        windowCandidates = CCLWindow(im, pixelCandidates); 
+        windowCandidates = candidatesArbitration(windowCandidates);
 end
 
-% Window candidates arbitration
-del=[];
-N = size(windowCandidates, 1);
-for i=1:N
-    if nnz(del==i)==0
-        for j=i+1:N
-           if nnz(del==j)==0
-               dist=norm(windowCandidates(i)-windowCandidates(j));
-               if dist<200
-                   windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
-                   windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
-                   windowCandidates(i,3)=max(windowCandidates(i,3),windowCandidates(j,3));
-                   windowCandidates(i,4)=max(windowCandidates(i,4),windowCandidates(j,4));
-                   del=[del j];
-               end
-           end
-        end
-    end
-end
-windowCandidates(del,:)=[];
 
 %Window candidates post-filtering
 keep=[];
@@ -57,4 +65,37 @@ for i=1:N
     windowCandidatesFinal=[windowCandidatesFinal; box_struct];
 end
 
+end
+
+function windCandidates = candidatesArbitration(windowCandidates)
+% Window candidates arbitration
+del=[];
+for i=1:size(windowCandidates,1)
+    if nnz(del==i)==0
+        for j=i+1:size(windowCandidates,1)
+           if nnz(del==j)==0
+               if strcmp(window_method,'convolution')
+                   if abs(windowCandidates(i,2) - windowCandidates(j,2))<=max([windowCandidates(i,3),windowCandidates(j,3)])/2
+                       windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
+                       windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
+                       windowCandidates(i,3)=max(windowCandidates(i,3),windowCandidates(j,3));
+                       windowCandidates(i,4)=max(windowCandidates(i,4),windowCandidates(j,4));
+                       del=[del j];
+                   end
+               else    
+                   dist=norm(windowCandidates(i)-windowCandidates(j));
+                   if dist<200
+                       windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
+                       windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
+                       windowCandidates(i,3)=max(windowCandidates(i,3),windowCandidates(j,3));
+                       windowCandidates(i,4)=max(windowCandidates(i,4),windowCandidates(j,4));
+                       del=[del j];
+                   end
+               end               
+           end
+        end
+    end
+end
+windowCandidates(del,:)=[];
+windCandidates = windowCandidates;
 end
