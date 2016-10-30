@@ -42,8 +42,8 @@ function MorphEvalCurve(directory, set, pixel_method, window_method, decision_me
     %end
     
     % Area opening size and morphological filtering method (1 or 2)
-    ao_size = [400, 450, 500, 550];
-    morph_method = 1;
+    ao_size = 10:10:250;
+    morph_method = 2;
     
     % Variables to store the evaluation scores
     N = length(ao_size);

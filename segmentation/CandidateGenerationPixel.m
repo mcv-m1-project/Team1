@@ -4,19 +4,20 @@ function [pixelCandidates] = CandidateGenerationPixel(im, space, histogram, thre
 normmethod = 'a'; %'paper' for the normalization of Swain Ballard's paper
 % anything else for a simple hist/max(hist) normalization
 
+% DEFAULT HSV THRESHOLD (SWAIN BALLARDS NORM)
+DEFAULT_HSV_SB_NORM = 0.23;
+% DEFAULT HSV THRESHOLD
+DEFAULT_HSV_THRESHOLD = 0.01;
 % DEFAULT RGB THRESHOLD
 DEFAULT_RGB_THRESHOLD = 100;
-
-% DEFAULT HSV THRESHOLD
-DEFAULT_HSV_THRESHOLD = 0.092;
 
 if nargin < 4
     % Default thresholds
     normrgb_threshold = DEFAULT_RGB_THRESHOLD;
     if strcmp(normmethod, 'paper')
-        hsv_threshold = 0.23;
+        hsv_threshold = DEFAULT_HSV_SB_NORM;
     else 
-        hsv_threshold = 0.092;
+        hsv_threshold = DEFAULT_HSV_THRESHOLD;
     end
     
 else
@@ -71,7 +72,7 @@ switch space
             histogram(histogram < 0) = 0;
         else
             %Eliminate low saturated values
-            grays = 20;
+            grays = 40;
             histogram(:,1:grays)=0;
             histogram = histogram / max(max(histogram));
         end
