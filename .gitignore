@@ -4,8 +4,10 @@
 # Dataset
 */DataSetDelivered/train
 */DataSetDelivered/test
+*/DataSetDelivered/fake_test
 DataSetDelivered/train
 DataSetDelivered/test
+DataSetDelivered/fake_test
 
 # MATLAB files
 *.asv
