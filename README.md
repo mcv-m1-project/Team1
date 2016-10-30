@@ -1,4 +1,4 @@
-# Team1 - Week 2
+# Team1 - Week 3
 
 ## Execution instructions
 
@@ -23,7 +23,7 @@ Note that this computation is not deterministic, as it involves random permutati
 
 - **Compute masks for any input**
 
-Run the `TrafficSignDetection_test` function with the necessary input arguments. For example `TrafficSignDetection_test('DataSetDelivered/test','test','hsv','','')`. The created masks will be stored in the specified output directory ('test' in the example).
+Run the `TrafficSignDetection_test` function with the necessary input arguments. For example `TrafficSignDetection_test('DataSetDelivered/test','test','hsv','convolution','', 0)`. The created masks will be stored in the specified output directory ('test' in the example).
 
 - **Performance evaluation**
 

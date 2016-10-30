@@ -2,8 +2,10 @@
 % Template example for using on the validation set.
 %
 
-function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method)
+function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method, plot_results)
     tic
+    close all;
+
     % TrafficSignDetection
     % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
     % using a color segmentation. Then, using the color segmentation as a basis, the most likely window
@@ -17,6 +19,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %    'pixel_method'      Name of the color space: 'opp', 'normrgb', 'lab', 'hsv', etc. (Weeks 2-5)
     %    'window_method'     'SegmentationCCL' or 'SlidingWindow' (Weeks 3-5)
     %    'decision_method'   'GeometricHeuristics' or 'TemplateMatching' (Weeks 4-5)
+    %    'plot_results'       0 or 1
 
 
     global CANONICAL_W;        CANONICAL_W = 64;
@@ -45,7 +48,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %   triangleTemplate  = load('TemplateTriangles.mat');
     %end
 
-    % windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
+    windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
 
 
@@ -70,21 +73,22 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     histogram = histogram/max(max(histogram));
 
     for i=1:size(dataset_split,2)
+        % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
         im = imread(dataset_split(i).image);
 
         % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
+        pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram);
         
         % Morphological filtering of candidate pixels
-        pixelCandidates = MorphologicalFiltering(pixelCandidates);
+        pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % windowCandidates = CandidateGenerationWindow_Example(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
 
+        
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
-
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
@@ -92,80 +96,47 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelTN = pixelTN + localPixelTN;
 
         % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
-        % windowAnnotations = LoadAnnotations(strcat(directory, '/gt/gt.', files(i).name(1:size(files(i).name,2)-3), 'txt'));
-        % [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
-        % windowTP = windowTP + localWindowTP;
-        % windowFN = windowFN + localWindowFN;
-        % windowFP = windowFP + localWindowFP;
+        windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
+        [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
+        windowTP = windowTP + localWindowTP;
+        windowFN = windowFN + localWindowFN;
+        windowFP = windowFP + localWindowFP;
+        
+        % Show progress
+        fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
+
+        if plot_results 
+            hAx  = axes;
+            imshow(pixelCandidates,'Parent', hAx);
+             for zz = 1:size(windowCandidates,1)
+                 r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+                 setColor(r,'r');
+             end
+        end
+ 
     end
 
     % Performance evaluation
     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
     Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+    fprintf('PIXEL-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
     fprintf('Precision: %f\n', pixelPrecision)
     fprintf('Recall: %f\n', pixelSensitivity)
-    fprintf('F measure: %f\n', Fmeasure)
-    fprintf('Pixel accuracy: %f\n', pixelAccuracy)
-    fprintf('Pixel specificity: %f\n', pixelSpecificity)
+    fprintf('Accuracy: %f\n', pixelAccuracy)
+    fprintf('Specificity: %f\n', pixelSpecificity)
+    fprintf('F measure: %f\n\n', Fmeasure)
 
-    % [windowPrecision, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP); % (Needed after Week 3)
+    [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
 
-    % [windowPrecision, windowAccuracy]
+    fprintf('REGION-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
+    fprintf('Precision: %f\n', windowPrecision)
+    fprintf('Recall: %f\n', windowRecall)
+    fprintf('Accuracy: %f\n', windowAccuracy)
+
+    
     %profile report
     %profile off
     toc
-end
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CandidateGeneration
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [windowCandidates] = CandidateGenerationWindow_Example(im, pixelCandidates, window_method)
-windowCandidates = [ struct('x',double(12),'y',double(17),'w',double(32),'h',double(32)) ];
-end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Performance Evaluation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function PerformanceEvaluationROC(scores, labels, thresholdRange)
-% PerformanceEvaluationROC
-%  ROC Curve with precision and accuracy
-
-roc = [];
-for t=thresholdRange
-    TP=0;
-    FP=0;
-    for i=1:size(scores,1)
-        if scores(i) > t    % scored positive
-            if labels(i)==1 % labeled positive
-                TP=TP+1;
-            else            % labeled negative
-                FP=FP+1;
-            end
-        else                % scored negative
-            if labels(i)==1 % labeled positive
-                FN = FN+1;
-            else            % labeled negative
-                TN = TN+1;
-            end
-        end
-    end
-
-    precision = TP / (TP+FP+FN+TN);
-    accuracy = TP / (TP+FN+FP);
-
-    roc = [roc ; precision accuracy];
-end
-
-plot(roc);
 end
