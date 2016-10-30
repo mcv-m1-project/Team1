@@ -2,7 +2,7 @@
 % Template example for using on the validation set.
 %
 
-function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method)
+function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method, plot_results)
     tic
     close all;
 
@@ -19,6 +19,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %    'pixel_method'      Name of the color space: 'opp', 'normrgb', 'lab', 'hsv', etc. (Weeks 2-5)
     %    'window_method'     'SegmentationCCL' or 'SlidingWindow' (Weeks 3-5)
     %    'decision_method'   'GeometricHeuristics' or 'TemplateMatching' (Weeks 4-5)
+    %    'plot_results'       0 or 1
 
 
     global CANONICAL_W;        CANONICAL_W = 64;
@@ -100,23 +101,18 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         windowTP = windowTP + localWindowTP;
         windowFN = windowFN + localWindowFN;
         windowFP = windowFP + localWindowFP;
-        out_file = strcat('valseg','/m',int2str(i),'.png');
-        out_file1 = strcat('valsegM','/m',int2str(i),'.png');
-        
-        imwrite (pixelCandidates1,out_file);
-        imwrite (pixelCandidates,out_file1);
         
         % Show progress
         fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
 
-        hAx  = axes;
-        imshow(pixelCandidates,'Parent', hAx);
-         for zz = 1:size(windowCandidates,1)
-             r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
-             setColor(r,'r');
-         end
-         %out_file = strcat('valsegA6','/m',int2str(i),'.png');
-         %print(out_file,'-dpng')
+        if plot_results 
+            hAx  = axes;
+            imshow(pixelCandidates,'Parent', hAx);
+             for zz = 1:size(windowCandidates,1)
+                 r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+                 setColor(r,'r');
+             end
+        end
  
     end
 
