@@ -85,8 +85,11 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
-
-        
+        pixelCandidatesFinal=zeros(size(pixelCandidates));
+        for ind=1:size(windowCandidates,1)
+            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w);
+        end
+        pixelCandidates=pixelCandidatesFinal;
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
