@@ -9,6 +9,9 @@ switch(window_method)
     case {'naive_window', 'integral_window' }
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
         windowCandidates = candidatesArbitration(windowCandidates,window_method);
+    case 'template_matching'
+        windowCandidates = TemplateMatchingChamfer(im, pixelCandidates, 'hsv');
+        windowCandidates = candidatesArbitration(windowCandidates,window_method);
     case 'convolution'
         
         [mask,split] = splitMask(pixelCandidates);
@@ -74,7 +77,7 @@ for i=1:size(windowCandidates,1)
     if nnz(del==i)==0
         for j=i+1:size(windowCandidates,1)
            if nnz(del==j)==0
-               if strcmp(window_method,'convolution')
+               if strcmp(window_method,'convolution') %|| strcmp(window_method,'template_matching')
                    if abs(windowCandidates(i,2) - windowCandidates(j,2))<=max([windowCandidates(i,3),windowCandidates(j,3)])/2
                        windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
                        windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
