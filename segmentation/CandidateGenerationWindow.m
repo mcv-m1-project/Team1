@@ -38,7 +38,9 @@ switch(window_method)
             windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
             windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
-        
+    case 'templates_corr'
+        templates=extractSignalTemplates;
+        windowCandidates=TemplateMatchingCorrelation (im, templates);
     otherwise
         % Default method: Connected Components Labeling
         windowCandidates = CCLWindow(im, pixelCandidates); 
@@ -77,7 +79,7 @@ for i=1:size(windowCandidates,1)
     if nnz(del==i)==0
         for j=i+1:size(windowCandidates,1)
            if nnz(del==j)==0
-               if strcmp(window_method,'convolution') %|| strcmp(window_method,'template_matching')
+               if strcmp(window_method,'convolution')
                    if abs(windowCandidates(i,2) - windowCandidates(j,2))<=max([windowCandidates(i,3),windowCandidates(j,3)])/2
                        windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
                        windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
