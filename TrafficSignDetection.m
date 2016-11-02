@@ -107,11 +107,12 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
         if plot_results 
             hAx  = axes;
-            imshow(pixelCandidates,'Parent', hAx);
+            imshow(im,'Parent', hAx);
              for zz = 1:size(windowCandidates,1)
                  r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
                  setColor(r,'r');
              end
+             pause(2);
         end
  
     end

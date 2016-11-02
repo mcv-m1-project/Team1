@@ -35,7 +35,9 @@ switch(window_method)
             windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
             windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
-        
+    case 'templates_corr'
+        templates=extractSignalTemplates;
+        windowCandidates=TemplateMatchingCorrelation (im, templates);
     otherwise
         % Default method: Connected Components Labeling
         windowCandidates = CCLWindow(im, pixelCandidates); 
