@@ -85,11 +85,12 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
-        pixelCandidatesFinal=zeros(size(pixelCandidates));
+      pixelCandidatesFinal=zeros(size(pixelCandidates));
         for ind=1:size(windowCandidates,1)
-            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w);
+            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1);
         end
         pixelCandidates=pixelCandidatesFinal;
+        
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
@@ -110,11 +111,12 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
         if plot_results 
             hAx  = axes;
-            imshow(pixelCandidates,'Parent', hAx);
+            imshow(im,'Parent', hAx);
              for zz = 1:size(windowCandidates,1)
                  r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
                  setColor(r,'r');
              end
+             pause(2);
         end
  
     end
