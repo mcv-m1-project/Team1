@@ -71,7 +71,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     histogram = loadHistograms('joint', pixel_method,'');
     %Normalize histogram
     histogram = histogram/max(max(histogram));
-
+ if(strcmp(window_method,'templates_corr'))
+     templates=extractSignalTemplates;
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
@@ -84,12 +85,16 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
         % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
-      pixelCandidatesFinal=zeros(size(pixelCandidates));
-        for ind=1:size(windowCandidates,1)
-            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1);
+        if(strcmp(window_method,'templates_corr'))
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method,templates); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+        else
+         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
         end
-        pixelCandidates=pixelCandidatesFinal;
+%pixelCandidatesFinal=zeros(size(pixelCandidates));
+%         for ind=1:size(windowCandidates,1)
+%             pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1);
+%         end
+%         pixelCandidates=pixelCandidatesFinal;
         
         % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
         pixelAnnotation = imread(dataset_split(i).mask)>0;
