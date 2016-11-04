@@ -26,8 +26,10 @@ for i=1:length(train_dataset) %iterate over train DB split
     
  [bound_box, type, num_elems] = parse_annotations(train_dataset(i).annotations);
   %Read image
-    image = imread(train_dataset(i).image);
-    image=rgb2gray(image);
+    image_ = imread(train_dataset(i).image);
+    image=rgb2gray(image_);
+  %  image_=rgb2hsv(image_);
+  %   image=image_(:,:,1);
  %Read mask
     mask = imread(train_dataset(i).mask);
 

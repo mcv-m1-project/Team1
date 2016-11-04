@@ -1,4 +1,4 @@
-function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates, window_method)
+function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates, window_method,templates)
 %CANDIDATEGENERATIONWINDOW Window candidates from pixel candidates
 %   Detailed explanation goes here
 
@@ -39,12 +39,14 @@ switch(window_method)
             windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
     case 'templates_corr'
-        templates=extractSignalTemplates;
-        windowCandidates=TemplateMatchingCorrelation (im, templates);
+   %  windowCandidates = CCLWindow(im, pixelCandidates);
+         windowCandidates=TemplateMatchingCorrelation (im,pixelCandidates,templates);
+       windowCandidates = candidatesArbitration(windowCandidates,window_method);
     otherwise
         % Default method: Connected Components Labeling
-        windowCandidates = CCLWindow(im, pixelCandidates); 
-        windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        error ('No valid method selected');
+      %  windowCandidates = CCLWindow(im, pixelCandidates); 
+      %  windowCandidates = candidatesArbitration(windowCandidates,window_method);
 end
 
 
