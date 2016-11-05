@@ -2,7 +2,7 @@
 % Template example for using on the validation set.
 %
 
-function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method, plot_results,templates)
+function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method, plot_results)
     tic
     close all;
 
@@ -58,7 +58,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     
     % Load templates for correlation method
     if(strcmp(window_method,'template_corr'))
-        load(fullfile(directory, 'templates.mat'));
+        templates = fullfile(directory, 'templates_hue.mat');
     end
         
     for i=1:size(dataset_split,2)
