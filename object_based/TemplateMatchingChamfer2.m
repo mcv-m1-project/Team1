@@ -68,7 +68,7 @@ for t =1:7
         %Add a black line in the bottom to get that contour
         sig(tempsize+1,:)=0;
         %Compute contours of signal template
-        contA = edge(sigA,'Roberts');
+        contA = edge(sig,'Roberts');
         
         %Multiply "by hand"
         % cor = ones(size(gray))*1000000;
@@ -103,7 +103,7 @@ for t =1:7
 %             end
 
             %Save the window candidate
-            windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(sigA,2), size(sigA,1)]];
+            windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(sig,2), size(sig,1)]];
         end
     end
 end
