@@ -10,7 +10,7 @@ switch(window_method)
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
         windowCandidates = candidatesArbitration(windowCandidates,window_method);
     case 'template_matching'
-        windowCandidates = TemplateMatchingChamfer(im, pixelCandidates, 'hsv');
+        windowCandidates = TemplateMatchingChamfer2(im,templates);
         windowCandidates = candidatesArbitration(windowCandidates,window_method);
     case 'correlation'
         [mask,split] = splitMask(pixelCandidates);
@@ -45,18 +45,19 @@ end
 
 
 % Window candidates post-filtering
-keep=[];
-N = size(windowCandidates, 1);
-for ind=1:N
-    bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
-            min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
-            min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
-    f_factor = form_factor(bbox);
-    if (f_factor > 0.5 && f_factor < 2)
-        keep = [keep ind];
-    end
-end
-windowCandidates = windowCandidates(keep, :);
+% keep=[];
+% N = size(windowCandidates, 1);
+% for ind=1:N
+%     bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
+%             min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
+%             min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
+%     f_factor = form_factor(bbox);
+%     if (f_factor > 0.5 && f_factor < 2)
+%         keep = [keep ind];
+%     end
+% end
+% windowCandidates = windowCandidates(keep, :);
+
 
 % Window candidates transformation to struct
 windowCandidatesFinal=[];
