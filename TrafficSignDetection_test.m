@@ -68,6 +68,16 @@ for i=1:size(files,1)
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
     
+    % Filter candidate pixels with candidate windows
+    pixelCandidatesFinal=zeros(size(pixelCandidates));
+    for ind=1:size(windowCandidates,1)
+        pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+        windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1) = ...
+        pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+        windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1);
+    end
+    pixelCandidates = pixelCandidatesFinal;
+    
     %out_file1 = sprintf ('%s/test/pixelCandidates.mat',  output_dir);
     %out_file1 = sprintf ('%s/test/windowCandidates.mat', output_dir);
     out_file = strcat(output_dir,'/m',files(i).name);

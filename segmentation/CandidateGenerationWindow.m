@@ -12,10 +12,8 @@ switch(window_method)
     case 'template_matching'
         windowCandidates = TemplateMatchingChamfer(im, pixelCandidates, 'hsv');
         windowCandidates = candidatesArbitration(windowCandidates,window_method);
-    case 'convolution'
-        
+    case 'correlation'
         [mask,split] = splitMask(pixelCandidates);
-        
         if split == 0
             %Image is empty
             windowCandidates = candidatesArbitration([],window_method);
@@ -39,18 +37,14 @@ switch(window_method)
             windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
     case 'templates_corr'
-   %  windowCandidates = CCLWindow(im, pixelCandidates);
-         windowCandidates=TemplateMatchingCorrelation (im,pixelCandidates,templates);
-       windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        windowCandidates=TemplateMatchingCorrelation (im,pixelCandidates,templates);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method);
     otherwise
-        % Default method: Connected Components Labeling
-        error ('No valid method selected');
-      %  windowCandidates = CCLWindow(im, pixelCandidates); 
-      %  windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, templates_corr');
 end
 
 
-%Window candidates post-filtering
+% Window candidates post-filtering
 keep=[];
 N = size(windowCandidates, 1);
 for ind=1:N
@@ -67,8 +61,13 @@ windowCandidates = windowCandidates(keep, :);
 % Window candidates transformation to struct
 windowCandidatesFinal=[];
 N = size(windowCandidates, 1);
+[im_height, im_width] = size(pixelCandidates);
 for i=1:N
-    box_struct = struct('x', windowCandidates(i,1), 'y', windowCandidates(i,2), 'w', windowCandidates(i,3), 'h', windowCandidates(i,4));
+    box_struct = struct(...
+        'x', max(windowCandidates(i,1), 1), ...
+        'y', max(windowCandidates(i,2), 1), ...
+        'w', min(windowCandidates(i,3), im_width - windowCandidates(i,1)), ...
+        'h', min(windowCandidates(i,4), im_height - windowCandidates(i,2)));
     windowCandidatesFinal=[windowCandidatesFinal; box_struct];
 end
 
