@@ -76,6 +76,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     % Load templates for correlation method
     if(strcmp(window_method,'templates_corr'))
         templates=extractSignalTemplates;
+        close all
     end
         
     for i=1:size(dataset_split,2)
@@ -176,6 +177,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Accuracy: %f\n', pixelAccuracy)
     fprintf('Specificity: %f\n', pixelSpecificity)
     fprintf('F measure: %f\n\n', Fmeasure)
+
 
     [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
 
