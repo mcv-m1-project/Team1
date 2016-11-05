@@ -74,10 +74,10 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     histogram = histogram/max(max(histogram));
     
     % Load templates for correlation method
-    if(strcmp(window_method,'templates_corr'))
-     %   templates=extractSignalTemplates;
-    end
-        
+
+    templates=extractSignalTemplates;
+    close all
+
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
@@ -90,11 +90,8 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
         % Candidate Generation (window)
-        if(strcmp(window_method, 'templates_corr'))
-            windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates); 
-        else
-            windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); 
-        end
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates); 
+
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
         for ind=1:size(windowCandidates,1)
@@ -176,6 +173,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Accuracy: %f\n', pixelAccuracy)
     fprintf('Specificity: %f\n', pixelSpecificity)
     fprintf('F measure: %f\n\n', Fmeasure)
+
 
     [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
 
