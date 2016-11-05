@@ -134,15 +134,24 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
 
         if plot_results 
-            hAx  = axes;
-            imshow(im,'Parent', hAx);
-             for zz = 1:size(windowCandidates,1)
-                 r=imrect(hAx, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
-                 setColor(r,'r');
-             end
-             pause(2);
+            hAx_color = subplot(2, 2, 1);
+            imshow(pixelCandidates1, 'Parent', hAx_color);
+            title('Color segmentation');
+            hAx_morph = subplot(2, 2, 2);
+            imshow(pixelCandidates, 'Parent', hAx_morph);
+            title('Morphological filtering');
+            hAx_post = subplot(2, 2, 3);
+            imshow(pixelCandidatesFinal, 'Parent', hAx_post);
+            title('Pixel filtering with window candidates');
+            hAx_window  =  subplot(2, 2, 4);
+            imshow(im,'Parent', hAx_window);
+            title('Window candidates over original image');
+            for zz = 1:size(windowCandidates,1)
+                r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+                setColor(r,'r');
+            end
+            pause(2);
         end
- 
     end
 
     % Performance evaluation
