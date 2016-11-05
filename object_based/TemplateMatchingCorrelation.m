@@ -1,4 +1,4 @@
-function [windowCandidates] = TemplateMatchingCorrelation(im,pixelCandidates, templates)
+function [windowCandidates] = TemplateMatchingCorrelation(im, pixelCandidates, templates)
 %TEMPLATECORRELATION Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,7 +9,19 @@ xmax = 0;
 ymax = 0;
 [y,x]=size(pixelCandidates);
 windowCandidates = [];
-im=rgb2gray(im);
+
+% Load templates and transform image accordingly
+[~, name, ~] = fileparts(templates);
+if strcmp(name, 'templates')
+    load(templates);
+    im=rgb2gray(im);
+elseif strcmp(name, 'templates_hue')
+    load(templates);
+    im = rgb2hsv(im);
+    im = im(:, :, 1);
+else
+    error('The specified template is not supported.');
+end
 
 % Split image in 4 sections
 for id=1:4
@@ -51,7 +63,7 @@ for id=1:4
         c_im=im(ymin:ymax,xmin:xmax);
         im_y_offset = ymin;
         im_x_offset = xmin;
-        
+                
         % Reset xmin, ymin, xmax and ymax
         xmin = 16000;
         ymin = 16000;
@@ -64,45 +76,53 @@ for id=1:4
                 if (size(re_template)<size(c_im))
                     % Cross correlation
                     C = normxcorr2( re_template,c_im);
+                    
+                    if debug
+                        subplot(1,4,1)
+                        imshow(c_im)
+                        title('Partitioned image')
+                    end
                                 
                     % Find peaks of the correlation
                     marked_C=C;
-                    if max(max(C)) > 0.65
+                    if max(max(C)) > 0.6
                         [~, peaks] = FastPeakFind(C);
                         [ypeak,xpeak] = find(peaks);
             
                         for n = 1:size(ypeak,1)
-                            if C(ypeak(n),xpeak(n)) > 0.65
-                                yoffSet = ypeak(n)-size(re_template, 1);
-                                xoffSet = xpeak(n)-size(re_template, 2);
+                            if C(ypeak(n),xpeak(n)) > 0.6
+                                yoffSet = ypeak(n)-round(size(re_template, 1) / 2);
+                                xoffSet = xpeak(n)-round(size(re_template, 2) / 2);
                                 if yoffSet < 0 || xoffSet < 0
                                     break
                                 end
-                                windowCandidates=[windowCandidates; ...
-                                [im_x_offset + xoffSet + 1, im_y_offset + yoffSet + 1, ...
-                                size(re_template,2), size(re_template,1)]];
-                                marked_C=insertMarker(C, [yoffSet+1+size(re_template,1)/2,xoffSet+1+size(re_template,2)/2]);
+                                % Candidate window
+                                bbox = [im_x_offset + xoffSet + 1, im_y_offset + yoffSet + 1, ...
+                                size(re_template,2), size(re_template,1)];
+                                windowCandidates=[windowCandidates; bbox];
+                                % Mark peak and draw candidate window
+                                c_bbox = [xoffSet, yoffSet, size(re_template, 2), size(re_template, 1)];
+                                marked_C=insertMarker(C, [xoffSet+1+size(re_template, 2)/2,yoffSet+1+size(re_template,1)/2]);
+                                if debug
+                                    rectangle('Position', c_bbox, 'EdgeColor', 'r', 'LineWidth', 1.5);
+                                end
                             end
                         end
                     end
                     
                     % Plot peaks of correlation if debug is on
                     if debug==1
-                        subplot(1,4,1)
-                        imshow(im)
-                        title('original image')
                         subplot(1,4,2);
-                        imshow(c_im)
-                        title('partition we take to compute matching')
-                        subplot(1,4,3)
                         imshow(marked_C)
-                        title('correlation with marker on the peaks >0.6')
+                        title('Correlation with marker on the peaks')
+                        subplot(1,4,3)
+                        surf(C);
+                        title('3D surface of the correlation');
                         subplot(1,4,4)
                         imshow(re_template)
-                        title('template')
+                        title('Template')
                         pause(0.5);
                     end
-                    
                 end
             end
         end
