@@ -61,7 +61,7 @@ c_im=im(ymin:ymax,xmin:xmax);
 %     pause(2)
 if (size(re_template)<size(c_im))
   C = normxcorr2( re_template,c_im);
-  [ind_i,ind_j]=find(C==max(max(C))>0.6);
+ % [ind_i,ind_j]=find(C==max(max(C))>0.6);
      
   if debug==1
   subplot(1,4,1)
