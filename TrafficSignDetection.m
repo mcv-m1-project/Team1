@@ -50,6 +50,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
     windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
+    pixelTP_post=0; pixelFN_post=0; pixelFP_post=0; pixelTN_post=0;
 
 
     [train_split, val_split] = read_train_val_split(directory);
@@ -71,38 +72,56 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     histogram = loadHistograms('joint', pixel_method,'');
     %Normalize histogram
     histogram = histogram/max(max(histogram));
- if(strcmp(window_method,'templates_corr'))
-     templates=extractSignalTemplates;
+    
+    % Load templates for correlation method
+    if(strcmp(window_method,'templates_corr'))
+        templates=extractSignalTemplates;
+    end
+        
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
         im = imread(dataset_split(i).image);
 
-        % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Candidate Generation (pixel) 
         pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram);
         
         % Morphological filtering of candidate pixels
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
-        % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if(strcmp(window_method,'templates_corr'))
-        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method,templates); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+        % Candidate Generation (window)
+        if(strcmp(window_method, 'templates_corr'))
+            windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates); 
         else
-         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+            windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); 
         end
-%pixelCandidatesFinal=zeros(size(pixelCandidates));
-%         for ind=1:size(windowCandidates,1)
-%             pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1)=pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h-1,windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w-1);
-%         end
-%         pixelCandidates=pixelCandidatesFinal;
+        % Filter candidate pixels with candidate windows 
+        pixelCandidatesFinal=zeros(size(pixelCandidates));
+        for ind=1:size(windowCandidates,1)
+            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+            windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1) = ...
+            pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+            windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1);
+        end
         
-        % Accumulate pixel performance of the current image %%%%%%%%%%%%%%%%%
+        % Accumulate pixel performance of the current image 
         pixelAnnotation = imread(dataset_split(i).mask)>0;
-        [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
+        
+        % Original pixel candidates
+        [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = ...
+            PerformanceAccumulationPixel(pixelCandidates, pixelAnnotation);
         pixelTP = pixelTP + localPixelTP;
         pixelFP = pixelFP + localPixelFP;
         pixelFN = pixelFN + localPixelFN;
         pixelTN = pixelTN + localPixelTN;
+        
+        % Post-filtered pixel candidates
+        [localPixelTP_post, localPixelFP_post, localPixelFN_post, localPixelTN_post] = ...
+            PerformanceAccumulationPixel(pixelCandidatesFinal, pixelAnnotation);
+        pixelTP_post = pixelTP_post + localPixelTP_post;
+        pixelFP_post = pixelFP_post + localPixelFP_post;
+        pixelFN_post = pixelFN_post + localPixelFN_post;
+        pixelTN_post = pixelTN_post + localPixelTN_post;
 
         % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
         windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
@@ -127,9 +146,21 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     end
 
     % Performance evaluation
-    [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
+    [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
+        PerformanceEvaluationPixel(pixelTP, pixelFP, pixelFN, pixelTN);
     Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
     fprintf('PIXEL-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
+    fprintf('Precision: %f\n', pixelPrecision)
+    fprintf('Recall: %f\n', pixelSensitivity)
+    fprintf('Accuracy: %f\n', pixelAccuracy)
+    fprintf('Specificity: %f\n', pixelSpecificity)
+    fprintf('F measure: %f\n\n', Fmeasure)
+    
+    [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
+        PerformanceEvaluationPixel(pixelTP_post, pixelFP_post, pixelFN_post, pixelTN_post);
+    Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+    fprintf('PIXEL-BASED EVALUATION (filtered with window candidates)\n')
     fprintf('-----------------------\n')
     fprintf('Precision: %f\n', pixelPrecision)
     fprintf('Recall: %f\n', pixelSensitivity)
