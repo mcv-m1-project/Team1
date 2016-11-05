@@ -32,26 +32,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     global SW_MAXS;            SW_MAXS = 2.5;
     global SW_STRIDES;         SW_STRIDES = 1.2;
 
-
-    % Load models
-    %global circleTemplate;
-    %global givewayTemplate;
-    %global stopTemplate;
-    %global rectangleTemplate;
-    %global triangleTemplate;
-    %
-    %if strcmp(decision_method, 'TemplateMatching')
-    %   circleTemplate    = load('TemplateCircles.mat');
-    %   givewayTemplate   = load('TemplateGiveways.mat');
-    %   stopTemplate      = load('TemplateStops.mat');
-    %   rectangleTemplate = load('TemplateRectangles.mat');
-    %   triangleTemplate  = load('TemplateTriangles.mat');
-    %end
-
     windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
     pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
     pixelTP_post=0; pixelFN_post=0; pixelFP_post=0; pixelTN_post=0;
-
 
     [train_split, val_split] = read_train_val_split(directory);
     if strcmp(set, 'train')
@@ -74,10 +57,10 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     histogram = histogram/max(max(histogram));
     
     % Load templates for correlation method
-
-    templates=extractSignalTemplates;
-    close all
-
+    if(strcmp(window_method,'template_corr'))
+        load(fullfile(directory, 'templates.mat'));
+    end
+        
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image

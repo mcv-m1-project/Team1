@@ -1,4 +1,4 @@
-function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates, window_method,templates)
+function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates, window_method, templates)
 %CANDIDATEGENERATIONWINDOW Window candidates from pixel candidates
 %   Detailed explanation goes here
 
@@ -36,11 +36,11 @@ switch(window_method)
             windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
             windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
         end
-    case 'templates_corr'
-        windowCandidates=TemplateMatchingCorrelation (im,pixelCandidates,templates);
-        windowCandidates = candidatesArbitration(windowCandidates,window_method);
+    case 'template_corr'
+        windowCandidates=TemplateMatchingCorrelation (im, pixelCandidates, templates);
+        windowCandidates = candidatesArbitration(windowCandidates, window_method);
     otherwise
-        error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, templates_corr');
+        error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, template_corr');
 end
 
 
