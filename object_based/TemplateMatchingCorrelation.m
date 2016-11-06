@@ -61,6 +61,7 @@ for id=1:4
             end
         end    
         c_im=im(ymin:ymax,xmin:xmax);
+        c_im(pixelCandidates(ymin:ymax, xmin:xmax)==0)=-100;
         im_y_offset = ymin;
         im_x_offset = xmin;
                 
@@ -85,14 +86,14 @@ for id=1:4
                                 
                     % Find peaks of the correlation
                     marked_C=C;
-                    if max(max(C)) > 0.6
+                    if max(max(C)) > 0.65
                         [~, peaks] = FastPeakFind(C);
                         [ypeak,xpeak] = find(peaks);
             
                         for n = 1:size(ypeak,1)
-                            if C(ypeak(n),xpeak(n)) > 0.6
-                                yoffSet = ypeak(n)-round(size(re_template, 1) / 2);
-                                xoffSet = xpeak(n)-round(size(re_template, 2) / 2);
+                            if C(ypeak(n),xpeak(n)) > 0.65
+                                yoffSet = ypeak(n)-round(size(re_template, 1));
+                                xoffSet = xpeak(n)-round(size(re_template, 2));
                                 if yoffSet < 0 || xoffSet < 0
                                     break
                                 end
@@ -102,7 +103,7 @@ for id=1:4
                                 windowCandidates=[windowCandidates; bbox];
                                 % Mark peak and draw candidate window
                                 c_bbox = [xoffSet, yoffSet, size(re_template, 2), size(re_template, 1)];
-                                marked_C=insertMarker(C, [xoffSet+1+size(re_template, 2)/2,yoffSet+1+size(re_template,1)/2]);
+                                marked_C=insertMarker(C, [xoffSet+1+size(re_template, 2),yoffSet+1+size(re_template,1)]);
                                 if debug
                                     rectangle('Position', c_bbox, 'EdgeColor', 'r', 'LineWidth', 1.5);
                                 end
