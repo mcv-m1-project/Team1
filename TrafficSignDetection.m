@@ -58,8 +58,12 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     
     % Load templates for correlation method
     if(strcmp(window_method,'template_corr'))
+
         templates = fullfile(directory, 'templates.mat');
+    else
+        templates='';
     end
+    
         
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
@@ -73,7 +77,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 
         % Candidate Generation (window)
-        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates); 
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
 
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
