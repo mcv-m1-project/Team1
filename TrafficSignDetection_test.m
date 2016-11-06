@@ -52,6 +52,10 @@ histogram = loadHistograms('joint', pixel_method,'');
 %Normalize histogram
 %histogram = histogram/max(max(histogram));
 
+    % Load templates for correlation method
+    if(strcmp(window_method,'template_corr'))
+        templates = fullfile('DataSetDelivered', 'templates.mat');
+    end
 % Measure time
 tic
 for i=1:size(files,1)
@@ -66,7 +70,9 @@ for i=1:size(files,1)
     pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+
     
     % Filter candidate pixels with candidate windows
     pixelCandidatesFinal=zeros(size(pixelCandidates));
