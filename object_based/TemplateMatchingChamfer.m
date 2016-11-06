@@ -1,25 +1,22 @@
-function [windowCandidates] = TemplateMatchingChamfer(im, pixelCandidates, pixel_method)
-tic
-distance_threshold=50000;
-%Load histogram
-histogram = loadHistograms('joint', pixel_method,'');
-%Normalize histogram
-histogram = histogram/max(max(histogram));
-color_threshold=3500;
+function [windowCandidates] = TemplateMatchingChamfer(im, pixelCandidates, pixel_method, histogram)
+
+distance_threshold=90000;
+color_thresh=2000;
 %gray=rgb2gray(im);
 %TODO: Smoothing filter
-smooth=imgaussfilt(im,1.5);
-gray=rgb2gray(smooth);
+gray=rgb2gray(im);
+gray(~pixelCandidates)=0;
 %edges=edge(gray, 'canny');
 %edges2=imcontour(pixelCandidates,1);
-%edges2=edge(gray);
-se = strel(ones(3,3));
-edges2 = imdilate(gray, se) - imerode(gray, se);
+edges2=edge(gray, 'Roberts');
 D2=bwdist(edges2);
 %D1=bwdist(edges);
-windowCandidates=[];
-inii = 0;
-inij = 0;
+box=[];
+xmin = 16000;
+ymin = 16000;
+xmax = 0;
+ymax = 0;
+[y,x]=size(pixelCandidates);
 %%Circle template for the minimum size
 tempsize=60;
 circ=ones(tempsize, round(tempsize*0.95));
@@ -53,110 +50,103 @@ for i = 1:h1
     end
 end
 
-
-for tempsize=60:10:190
-    %distance_thresh=distance_threshold*tempsize/220;
-    %color_thresh=color_threshold*tempsize/220;
-    %interpolate templates
-    TC=imresize(circ,tempsize/60);
-    TR=imresize(rect, tempsize/60);
-    TT1=imresize(triangle, tempsize/60);
-    TT2=ones(size(TT1));
-    for i=1:size(TT1,1)
-        TT2(i,:)=TT1(size(TT1,1)-i+1,:);
+for id=1:4
+    if id==1
+        x_range=1:ceil(x/2);
+        y_range=1:ceil(y/2);
+    elseif id==2
+        x_range=ceil(x/2)+1:x;
+        y_range=1:ceil(y/2);
+    elseif id==3
+        x_range=1:ceil(x/2);
+        y_range=ceil(y/2)+1:y;
+    else
+        x_range=ceil(x/2)+1:x;
+        y_range=ceil(y/2)+1:y;
     end
-    normC=normxcorr2(TC,D2);
-    normR=normxcorr2(TR,D2);
-    normT1=normxcorr2(TT1,D2);
-    normT2=normxcorr2(TT2,D2);
-    normC=max(max(normC))-normC;
-    normR=max(max(normR))-normR;
-    normT1=max(max(normT1))-normT1;
-    normT2=max(max(normT2))-normT2;
-    if max(max(normC)) > 0.8
-            [~, peaks] = FastPeakFind(normC);
-            [ypeak,xpeak] = find(peaks);
-            for n = 1:size(ypeak,1)
-                if normC(ypeak(n),xpeak(n))>0.7
-                    yoffSet = ypeak(n) -size(TC,1);
-                    xoffSet = xpeak(n)-size(TC,2);
-                    if yoffSet < 0 || xoffSet < 0
-                        break
+    %total_operations = 0;
+    
+    %Discarting 'black-blocks' of the image 
+    if nnz(pixelCandidates(y_range, x_range))
+        %Finding the minimum and maximum position of "whites" in the image
+        %to slide the window inside this part, instead of slide the window 
+        %through the entire image.
+        for a=x_range
+            for b=y_range
+                if gray(b,a)~=0
+                    %num_pos_pixels = num_pos_pixels + 1;
+                    if xmin>a
+                        xmin=a;
+                    elseif xmax<a
+                        xmax=a;
                     end
-                    windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(triangle,2), size(triangle,1)]];
+                    if ymin>b
+                        ymin=b;
+                    elseif ymax<b
+                        ymax=b;
+                    end
                 end
             end
-    end
-    if max(max(normT1)) > 0.8
-        [~, peaks] = FastPeakFind(normT1);
-        [ypeak,xpeak] = find(peaks);
-        for n = 1:size(ypeak,1)
-            if normT1(ypeak(n),xpeak(n))>0.55
-                    yoffSet = ypeak(n) -size(TT2,1);
-                    xoffSet = xpeak(n)-size(TT1,2) + inij;
-                    if yoffSet < 0 || xoffSet < 0
-                        break
-                    end
-                windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(triangle,2), size(triangle,1)]];
-            end
         end
-    end
-    if max(max(normT2)) > 0.8
-        [~, peaks] = FastPeakFind(normT2);
-        [ypeak,xpeak] = find(peaks);
-        for n = 1:size(ypeak,1)
-            if normT2(ypeak(n),xpeak(n))>0.55
-                    yoffSet = ypeak(n);% -size(TT2,1);
-                    xoffSet = xpeak(n)-size(TT2,2) + inij;
-                    if yoffSet < 0 || xoffSet < 0
-                        break
-                    end
-                windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(triangle,2), size(triangle,1)]];
+        for tempsize=40:10:240
+            distance_thresh=distance_threshold*tempsize/240;
+            %interpolate templates
+            TC=imresize(circ,tempsize/60);
+            TR=imresize(rect, tempsize/60);
+            TT1=imresize(triangle, tempsize/60);
+            TT2=ones(size(TT1));
+            for i=1:size(TT1,1)
+                TT2(i,:)=TT1(size(TT1,1)-i+1,:);
             end
-        end
-    end
-    if max(max(normR)) > 0.8
-        [~, peaks] = FastPeakFind(normR);
-        [ypeak,xpeak] = find(peaks);
-        for n = 1:size(ypeak,1)
-            if normR(ypeak(n),xpeak(n))>0.8
-                    yoffSet = ypeak(n) -size(TR,1);
-                    xoffSet = xpeak(n)-size(TR,2) + inij;
-                    if yoffSet < 0 || xoffSet < 0
-                        break
-                    end
-                windowCandidates=[windowCandidates; [xoffSet+1,yoffSet+1,size(triangle,2), size(triangle,1)]];
+            
+            maxsize=max([size(TC,1), size(TT1,2), size(TT2,2), size(TR,1)]);
+            ymaxx=ymax;
+            xmaxx=xmax;
+            if xmax>size(pixelCandidates,2)-maxsize
+                xmaxx=size(pixelCandidates,2)-maxsize;
             end
-        end
-    end
-%     maxsize=max([size(TC,1), size(TT,2), size(TR,1)]);
-%     for i=1:12:(size(D2,1)-maxsize)
-%         for j=1:12:(size(D2,2)-maxsize)
-%             distanceC=sum(sum(D2(i:(i+size(TC,1)-1), j:(j+size(TC,2)-1)).*TC));
-%             distanceT=sum(sum(D2(i:(i+size(TT,1)-1), j:(j+size(TT,2)-1)).*TT));
-%             distanceR=sum(sum(D2(i:(i+size(TR,1)-1), j:(j+size(TR,2)-1)).*TR));
-%             if min([distanceC, distanceT, distanceR])<distance_thresh
-%                 if distanceC < min([distanceR, distanceT])  
-%                     w=size(TC,2)-1;
-%                     h=size(TC,1)-1;
-%                     thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TC,1)-1), j:(j+size(TC,2)-1),:), pixel_method, histogram)));
-%                 elseif distanceR < min([distanceC, distanceT]) 
-%                     w=size(TR,2)-1;
-%                     h=size(TR,1)-1;
-%                     thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TR,1)-1), j:(j+size(TR,2)-1),:), pixel_method, histogram)));
-%                 else
-%                     w=size(TT,2)-1;
-%                     h=size(TT,1)-1;
-%                     thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TT,1)-1), j:(j+size(TT,2)-1),:), pixel_method, histogram)));
-%                 end
-%                 if thresh>color_thresh
-%                     box=[box; [j, i, w, h]];
-%                 end
-%             end
-%         end
-%    end    
+            if ymax>size(pixelCandidates,1)-maxsize
+                ymaxx=size(pixelCandidates,1)-maxsize;
+            end
+            for j=xmin:10:xmaxx
+                for i=ymin:10:ymaxx
+                    distanceC=sum(sum(D2(i:(i+size(TC,1)-1), j:(j+size(TC,2)-1)).*TC));
+                    distanceT1=sum(sum(D2(i:(i+size(TT1,1)-1), j:(j+size(TT1,2)-1)).*TT1));
+                    distanceT2=sum(sum(D2(i:(i+size(TT2,1)-1), j:(j+size(TT2,2)-1)).*TT2));
+                    distanceR=sum(sum(D2(i:(i+size(TR,1)-1), j:(j+size(TR,2)-1)).*TR));
+                    if min([distanceC, distanceT1, distanceR, distanceT2])<distance_thresh
+                    
+                        w=0;
+                        h=0;
+                        thresh=0;
+                        if distanceC < distance_thresh*0.9
+                            w=size(TC,2)-1;
+                            h=size(TC,1)-1;
+                            thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TC,1)-1), j:(j+size(TC,2)-1),:), pixel_method, histogram)));
+                        elseif distanceR < distance_thresh*0.8
+                             w=size(TR,2)-1;
+                             h=size(TR,1)-1;
+                             thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TR,1)-1), j:(j+size(TR,2)-1),:), pixel_method, histogram)));
+                        elseif distanceT1 < distance_thresh 
+                            w=size(TT1,2)-1;
+                            h=size(TT1,1)-1;
+                            thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TT1,1)-1), j:(j+size(TT1,2)-1),:), pixel_method, histogram)));
+                        elseif distanceT2 < distance_thresh
+                            w=size(TT2,2)-1;
+                            h=size(TT2,1)-1;
+                            thresh=sum(sum(CandidateGenerationPixel(im(i:(i+size(TT2,1)-1), j:(j+size(TT2,2)-1),:), pixel_method, histogram)));
+                        end
+                        if thresh>color_thresh && w~=0 && h~=0
+                        %if  w~=0 && h~=0
+                            box=[box; [j, i, w, h]];
+                        end
+                    end
+                end
+           end    
 
+        end
+    end
 end
-%windowCandidates=box;
-toc
+
+windowCandidates=box;
 end
