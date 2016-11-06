@@ -66,7 +66,7 @@ for i=1:size(files,1)
     pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
+    windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
     
     % Filter candidate pixels with candidate windows
     pixelCandidatesFinal=zeros(size(pixelCandidates));
