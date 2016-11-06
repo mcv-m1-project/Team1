@@ -54,11 +54,11 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %Load histogram
     histogram = loadHistograms('joint', pixel_method,'');
     %Normalize histogram
-    histogram = histogram/max(max(histogram));
+  %  histogram = histogram/max(max(histogram));
     
     % Load templates for correlation method
     if(strcmp(window_method,'template_corr'))
-        templates = fullfile(directory, 'templates_hue.mat');
+        templates = fullfile(directory, 'templates.mat');
     end
         
     for i=1:size(dataset_split,2)
