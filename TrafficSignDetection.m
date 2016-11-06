@@ -134,7 +134,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
                 r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
                 setColor(r,'r');
             end
-            pause(2);
+            pause(1);
         end
     end
 
@@ -163,13 +163,13 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 
 
     [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
-
+    Fmeasure = (2*windowPrecision*windowRecall)/(windowPrecision+windowRecall);
     fprintf('REGION-BASED EVALUATION\n')
     fprintf('-----------------------\n')
     fprintf('Precision: %f\n', windowPrecision)
     fprintf('Recall: %f\n', windowRecall)
     fprintf('Accuracy: %f\n', windowAccuracy)
-
+    fprintf('F measure: %f\n\n', Fmeasure)
     
     %profile report
     %profile off
