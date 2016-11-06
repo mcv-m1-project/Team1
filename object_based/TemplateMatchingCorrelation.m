@@ -15,10 +15,12 @@ windowCandidates = [];
 if strcmp(name, 'templates')
     load(templates);
     im=rgb2gray(im);
+    threshold = 0.65;
 elseif strcmp(name, 'templates_hue')
     load(templates);
     im = rgb2hsv(im);
     im = im(:, :, 1);
+    threshold = 0.6;
 else
     error('The specified template is not supported.');
 end
@@ -86,12 +88,12 @@ for id=1:4
                                 
                     % Find peaks of the correlation
                     marked_C=C;
-                    if max(max(C)) > 0.65
+                    if max(max(C)) > threshold
                         [~, peaks] = FastPeakFind(C);
                         [ypeak,xpeak] = find(peaks);
             
                         for n = 1:size(ypeak,1)
-                            if C(ypeak(n),xpeak(n)) > 0.65
+                            if C(ypeak(n),xpeak(n)) > threshold
                                 yoffSet = ypeak(n)-round(size(re_template, 1));
                                 xoffSet = xpeak(n)-round(size(re_template, 2));
                                 if yoffSet < 0 || xoffSet < 0
