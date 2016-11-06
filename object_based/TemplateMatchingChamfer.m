@@ -35,7 +35,7 @@ rect=ones(tempsize, round(tempsize*0.83));
 rect(1:2,:)=0;
 rect(tempsize-1:tempsize,:)=0;
 rect(:,1:2)=0;
-rect(:,round(tempsize*1.01)-1:round(tempsize*0.83))=0;
+rect(:,round(tempsize*1.01)-1:round(tempsize*0.83)-1)=0;
 
 %%triangle template for the minimum size:
 
