@@ -1,8 +1,8 @@
-function [Ims, Ims2] = testMeanShift(Im, histogram)
+function [Ims] = testMeanShift(Im, histogram)
 tic
 Im = im2double(Im);
 Im = rgb2hsv(Im);
-sc=0.25;
+sc=1/4;
 I=imresize(Im, sc);
 % [x,y] = meshgrid(1:size(I,2),1:size(I,1)); 
 % L = [y(:)/max(y(:)),x(:)/max(x(:))]; % Spatial Features
@@ -13,7 +13,7 @@ I=imresize(Im, sc);
 I1D=rgb2gray(I);
 X = reshape(I,size(I,1)*size(I,2),3); 
 X1 = reshape(I1D,size(I1D,1)*size(I1D,2),1); 
-bandwidth=0.1;
+bandwidth=0.15;
 [clustCent,point2cluster,clustMembsCell] = MeanShiftCluster(X',bandwidth, 'flat');
 %[clustCent,point2cluster,clustMembsCell] = MeanShiftCluster(X',bandwidth, 'gaussian');
 [x,y]=find(clustCent(1:2,:)>=1);
@@ -23,7 +23,8 @@ end
 
 for i = 1:length(clustMembsCell)   % Replace Image Colors With Cluster Centers
     X(clustMembsCell{i},:) = repmat(clustCent(:,i)',size(clustMembsCell{i},2),1);
-    if ((clustCent(1,i)>= 0.925 || clustCent(1,i)<= 0.057  || (clustCent(1,i)>= 0.577 && clustCent(1,i)<= 0.762)) && clustCent(2,i)>= 0.36)
+    %if ((clustCent(1,i)>= 0.925 || clustCent(1,i)<= 0.059  || (clustCent(1,i)>= 0.479 && clustCent(1,i)<= 0.762)) && (clustCent(2,i)>= 0.2 &&clustCent(3,i)>= 0.1))
+    if ((clustCent(1,i)>= 0.9 || clustCent(1,i)<= 0.1  || (clustCent(1,i)>= 0.4 && clustCent(1,i)<= 0.8)) && (clustCent(2,i)>= 0.2 &&clustCent(3,i)>= 0.1))
         X1(clustMembsCell{i}) = 255;
     else
         X1(clustMembsCell{i}) = 0;
