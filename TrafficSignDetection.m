@@ -68,32 +68,33 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         % Read image
         im = imread(dataset_split(i).image);
         %dataset_split(i).name
-        pixelCandidates1 = testMeanShift(im, histogram);
+        %pixelCandidates1 = testMeanShift(im, histogram);
+        pixelCandidates1 = CandidateGenerationPixel(im, 'hsv_thr', histogram);
         imwrite(pixelCandidates1, strrep(strcat('DataSetDelivered/', dataset_split(i).name, '_seg.png'), '.jpg',''));
-        if plot_results 
-            hAx_color = subplot(1, 2, 1);
-            imshow(pixelCandidates1, 'Parent', hAx_color);
-            title('Color segmentation');
-            hAx_morph = subplot(1, 2, 2);
-            imshow(im, 'Parent', hAx_morph);
-            pause(1);
-        end
+%         if plot_results 
+%             hAx_color = subplot(1, 2, 1);
+%             imshow(pixelCandidates1, 'Parent', hAx_color);
+%             title('Color segmentation');
+%             hAx_morph = subplot(1, 2, 2);
+%             imshow(im, 'Parent', hAx_morph)
+%             drawnow
+%         end
         % Candidate Generation (pixel) 
-        %pixelCandidates1 = CandidateGenerationPixel(img, pixel_method, histogram);
+        %pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram);
         % Morphological filtering of candidate pixels
          pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 % 
-%         % Candidate Generation (window)
-%         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
-% 
-%         % Filter candidate pixels with candidate windows 
-%         pixelCandidatesFinal=zeros(size(pixelCandidates));
-%         for ind=1:size(windowCandidates,1)
-%             pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
-%             windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1) = ...
-%             pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
-%             windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1);
-%         end
+        % Candidate Generation (window)
+        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
+
+        % Filter candidate pixels with candidate windows 
+        pixelCandidatesFinal=zeros(size(pixelCandidates));
+        for ind=1:size(windowCandidates,1)
+            pixelCandidatesFinal(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+            windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1) = ...
+            pixelCandidates(windowCandidates(ind).y:windowCandidates(ind).y+windowCandidates(ind).h - 1, ...
+            windowCandidates(ind).x:windowCandidates(ind).x+windowCandidates(ind).w - 1);
+        end
         
         % Accumulate pixel performance of the current image 
         pixelAnnotation = imread(dataset_split(i).mask)>0;
@@ -107,42 +108,42 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelTN = pixelTN + localPixelTN;
         
         % Post-filtered pixel candidates
-%         [localPixelTP_post, localPixelFP_post, localPixelFN_post, localPixelTN_post] = ...
-%             PerformanceAccumulationPixel(pixelCandidatesFinal, pixelAnnotation);
-%         pixelTP_post = pixelTP_post + localPixelTP_post;
-%         pixelFP_post = pixelFP_post + localPixelFP_post;
-%         pixelFN_post = pixelFN_post + localPixelFN_post;
-%         pixelTN_post = pixelTN_post + localPixelTN_post;
-% 
-%         % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
-%         windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
-%         [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
-%         windowTP = windowTP + localWindowTP;
-%         windowFN = windowFN + localWindowFN;
-%         windowFP = windowFP + localWindowFP;
-%         
+        [localPixelTP_post, localPixelFP_post, localPixelFN_post, localPixelTN_post] = ...
+            PerformanceAccumulationPixel(pixelCandidatesFinal, pixelAnnotation);
+        pixelTP_post = pixelTP_post + localPixelTP_post;
+        pixelFP_post = pixelFP_post + localPixelFP_post;
+        pixelFN_post = pixelFN_post + localPixelFN_post;
+        pixelTN_post = pixelTN_post + localPixelTN_post;
+
+        % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
+        windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
+        [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
+        windowTP = windowTP + localWindowTP;
+        windowFN = windowFN + localWindowFN;
+        windowFP = windowFP + localWindowFP;
+        
         % Show progress
         fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
 
-%         if plot_results 
-%             hAx_color = subplot(2, 2, 1);
-%             imshow(pixelCandidates1, 'Parent', hAx_color);
-%             title('Color segmentation');
-%             hAx_morph = subplot(2, 2, 2);
-%             imshow(pixelCandidates, 'Parent', hAx_morph);
-%             title('Morphological filtering');
-%             hAx_post = subplot(2, 2, 3);
-%             imshow(pixelCandidatesFinal, 'Parent', hAx_post);
-%             title('Pixel filtering with window candidates');
-%             hAx_window  =  subplot(2, 2, 4);
-%             imshow(im,'Parent', hAx_window);
-%             title('Window candidates over original image');
-%             for zz = 1:size(windowCandidates,1)
-%                 r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
-%                 setColor(r,'r');
-%             end
-%             pause(1);
-%         end
+        if plot_results 
+            hAx_color = subplot(2, 2, 1);
+            imshow(pixelCandidates1, 'Parent', hAx_color);
+            title('Color segmentation');
+            hAx_morph = subplot(2, 2, 2);
+            imshow(pixelCandidates, 'Parent', hAx_morph);
+            title('Morphological filtering');
+            hAx_post = subplot(2, 2, 3);
+            imshow(pixelCandidatesFinal, 'Parent', hAx_post);
+            title('Pixel filtering with window candidates');
+            hAx_window  =  subplot(2, 2, 4);
+            imshow(im,'Parent', hAx_window);
+            title('Window candidates over original image');
+            for zz = 1:size(windowCandidates,1)
+                r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
+                setColor(r,'r');
+            end
+            pause(1);
+        end
     end
 
     % Performance evaluation
@@ -157,26 +158,26 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     fprintf('Specificity: %f\n', pixelSpecificity)
     fprintf('F measure: %f\n\n', Fmeasure)
     
-%     [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
-%         PerformanceEvaluationPixel(pixelTP_post, pixelFP_post, pixelFN_post, pixelTN_post);
-%     Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
-%     fprintf('PIXEL-BASED EVALUATION (filtered with window candidates)\n')
-%     fprintf('-----------------------\n')
-%     fprintf('Precision: %f\n', pixelPrecision)
-%     fprintf('Recall: %f\n', pixelSensitivity)
-%     fprintf('Accuracy: %f\n', pixelAccuracy)
-%     fprintf('Specificity: %f\n', pixelSpecificity)
-%     fprintf('F measure: %f\n\n', Fmeasure)
-% 
-% 
-%     [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
-%     Fmeasure = (2*windowPrecision*windowRecall)/(windowPrecision+windowRecall);
-%     fprintf('REGION-BASED EVALUATION\n')
-%     fprintf('-----------------------\n')
-%     fprintf('Precision: %f\n', windowPrecision)
-%     fprintf('Recall: %f\n', windowRecall)
-%     fprintf('Accuracy: %f\n', windowAccuracy)
-%     fprintf('F measure: %f\n\n', Fmeasure)
+    [pixelPrecision, pixelAccuracy, pixelSpecificity, pixelSensitivity] = ...
+        PerformanceEvaluationPixel(pixelTP_post, pixelFP_post, pixelFN_post, pixelTN_post);
+    Fmeasure = (2*pixelPrecision*pixelSensitivity)/(pixelPrecision+pixelSensitivity);
+    fprintf('PIXEL-BASED EVALUATION (filtered with window candidates)\n')
+    fprintf('-----------------------\n')
+    fprintf('Precision: %f\n', pixelPrecision)
+    fprintf('Recall: %f\n', pixelSensitivity)
+    fprintf('Accuracy: %f\n', pixelAccuracy)
+    fprintf('Specificity: %f\n', pixelSpecificity)
+    fprintf('F measure: %f\n\n', Fmeasure)
+
+
+    [windowPrecision, windowRecall, windowAccuracy] = PerformanceEvaluationWindow(windowTP, windowFN, windowFP);
+    Fmeasure = (2*windowPrecision*windowRecall)/(windowPrecision+windowRecall);
+    fprintf('REGION-BASED EVALUATION\n')
+    fprintf('-----------------------\n')
+    fprintf('Precision: %f\n', windowPrecision)
+    fprintf('Recall: %f\n', windowRecall)
+    fprintf('Accuracy: %f\n', windowAccuracy)
+    fprintf('F measure: %f\n\n', Fmeasure)
     
     %profile report
     %profile off

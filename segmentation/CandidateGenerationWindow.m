@@ -5,40 +5,40 @@ pixel_method='hsv';
 switch(window_method)
     case 'ccl'
         windowCandidates = CCLWindow(im, pixelCandidates);
-        windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method, histogram, im);
     case {'naive_window', 'integral_window' }
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
-        windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method, histogram, im);
     case 'template_matching'
         windowCandidates = TemplateMatchingChamfer(im, pixelCandidates, pixel_method, histogram);
-        windowCandidates = candidatesArbitration(windowCandidates,window_method);
+        windowCandidates = candidatesArbitration(windowCandidates,window_method, histogram, im);
     case 'correlation'
         [mask,split] = splitMask(pixelCandidates);
         if split == 0
             %Image is empty
-            windowCandidates = candidatesArbitration([],window_method);
+            windowCandidates = candidatesArbitration([],window_method, histogram, im);
         else
             [r,c] = size(pixelCandidates);
 
             %Look for triangles
             windowCandidatesT = ConvSlidingWindow(mask,split,r,c,'tri');
-            windowCandidates = candidatesArbitration(windowCandidatesT,window_method);
+            windowCandidates = candidatesArbitration(windowCandidatesT,window_method, histogram, im);
     
             %Look for circles
             windowCandidatesC = ConvSlidingWindow(mask,split,r,c,'circ');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesC,window_method)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesC,window_method, histogram,im)];
    
             %Look for inverted triangles
             windowCandidatesIT = ConvSlidingWindow(mask,split,r,c,'invtri');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesIT,window_method)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesIT,window_method, histogram, im)];
 
             %Look for rectangles/squares
             windowCandidatesR = ConvSlidingWindow(mask,split,r,c,'rect');
-            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method)];
+            windowCandidates = [windowCandidates; candidatesArbitration(windowCandidatesR,window_method, histogram, im)];
         end
     case 'template_corr'
         windowCandidates=TemplateMatchingCorrelation (im, pixelCandidates, templates);
-        windowCandidates = candidatesArbitration(windowCandidates, window_method);
+        windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
     otherwise
         error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, template_corr');
 end
@@ -74,7 +74,7 @@ end
 
 end
 
-function windCandidates = candidatesArbitration(windowCandidates,window_method)
+function windCandidates = candidatesArbitration(windowCandidates,window_method, histogram,im)
 % Window candidates arbitration
 del=[];
 for i=1:size(windowCandidates,1)
@@ -102,6 +102,14 @@ for i=1:size(windowCandidates,1)
                end               
            end
         end
+    end
+end
+windowCandidates(del,:)=[];  
+del=[];
+
+for i=1:size(windowCandidates,1)
+    if sum(sum(CandidateGenerationPixel(im(windowCandidates(i,2):windowCandidates(i,2)+windowCandidates(i,4), windowCandidates(i,1):windowCandidates(i,1)+windowCandidates(i,3),:), 'hsv', histogram)))<600
+        del = [del, i];
     end
 end
 windowCandidates(del,:)=[];  
