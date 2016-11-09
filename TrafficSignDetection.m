@@ -86,7 +86,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
 % 
         % Candidate Generation (window)
         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
-
+        %windowCandidates=HoughTransform(im, pixelCandidates);
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
         for ind=1:size(windowCandidates,1)
@@ -98,6 +98,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         
         % Accumulate pixel performance of the current image 
         pixelAnnotation = imread(dataset_split(i).mask)>0;
+        
         
         % Original pixel candidates
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = ...
