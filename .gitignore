@@ -13,3 +13,4 @@ DataSetDelivered/fake_test
 *.asv
 
 *.jpg
+DataSetDelivered/*.png
