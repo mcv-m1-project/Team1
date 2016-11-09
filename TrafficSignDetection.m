@@ -68,8 +68,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         % Read image
         im = imread(dataset_split(i).image);
         %dataset_split(i).name
-        pixelCandidates1 = testMeanShift(im, histogram);
-        imwrite(pixelCandidates1, strrep(strcat('DataSetDelivered/', dataset_split(i).name, '_seg.png'), '.jpg',''));
+       % pixelCandidates1 = testMeanShift(im, histogram);
+       pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram); 
+       imwrite(pixelCandidates1, strrep(strcat('DataSetDelivered/', dataset_split(i).name, '_seg.png'), '.jpg',''));
         if plot_results 
             hAx_color = subplot(1, 2, 1);
             imshow(pixelCandidates1, 'Parent', hAx_color);
@@ -79,13 +80,14 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
             pause(1);
         end
         % Candidate Generation (pixel) 
-        %pixelCandidates1 = CandidateGenerationPixel(img, pixel_method, histogram);
+       % pixelCandidates1 = CandidateGenerationPixel(img, pixel_method, histogram);
         % Morphological filtering of candidate pixels
-         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
+       %
+       pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 % 
 %         % Candidate Generation (window)
 %         windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
-% 
+         windowCandidates=HoughTransform(im, pixelCandidates);
 %         % Filter candidate pixels with candidate windows 
 %         pixelCandidatesFinal=zeros(size(pixelCandidates));
 %         for ind=1:size(windowCandidates,1)
