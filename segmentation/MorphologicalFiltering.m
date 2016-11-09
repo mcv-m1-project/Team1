@@ -63,16 +63,16 @@ switch(method)
         
     case 4
         
-        SE = strel('line', 15,60);
+        SE = strel('line', 10, 60);
         pixelCandidates = imclose(pixelCandidates, SE);
-        SE = strel('line', 15,120);
+        SE = strel('line', 10, 120);
         pixelCandidates = imclose(pixelCandidates, SE);
-        SE = strel('line', 10,0);
+        SE = strel('line', 10, 0);
         pixelCandidates = imclose(pixelCandidates, SE);
         
-        SE = strel('line', 10,-60);
+        SE = strel('line', 10, -60);
         pixelCandidates = imclose(pixelCandidates, SE);
-        SE = strel('line', 10,-120);
+        SE = strel('line', 10, -120);
         pixelCandidates = imclose(pixelCandidates, SE);
         
         
@@ -81,11 +81,11 @@ switch(method)
         %SE = strel('disk', 4);
         %pixelCandidates = imopen(pixelCandidates, SE);
         
-        pixelCandidates = bwareaopen(pixelCandidates, 600,4);
-        pixelCandidates= pixelCandidates & ~bwareaopen(pixelCandidates,80000);
+        pixelCandidates = bwareaopen(pixelCandidates, 600, 4);
+        pixelCandidates= pixelCandidates & ~bwareaopen(pixelCandidates, 80000);
 
     otherwise
-        error('You must specify one of the two following methods: 1, 2, 3');
+        error('You must specify one of the two following methods: 1, 2, 3, 4');
 end
 end
 
