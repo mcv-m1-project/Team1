@@ -1,42 +1,44 @@
-function [ windowCandidates ] = HoughTransform(im, pixelCandidates)
+function [ windowCandidates ] = HoughTransform(im, pixelCandidates,f)
 %HOUGHTRANSFORM Summary of this function goes here
 %   Detailed explanation goes here
-close all
+figure(f);
 tic
+%extract contours
 pc_edges =  bwperim(pixelCandidates,8);
-%subplot(1,3,1)
-%imshow(pixelCandidates)
-%subplot(1,3,2)
-imshow(pc_edges)
-[H, theta,rho]=hough(pc_edges);
-pause(5)
+%dilate contour
+se=strel('disk',3);
+pc_edges=imdilate(pc_edges,se);
+%thin contour
+pc_edges=bwmorph(pc_edges,'thin');
 
-% peaks=houghpeaks(H,100);
-% lines = houghlines(H,theta,rho,peaks,'FillGap',5,'MinLength',7);
-% %figure,
-% subplot(1,3,1)
-% imshow(pixelCandidates)
-% subplot(1,3,2)
-% imshow(pc_edges)
-% max_len = 0;
-% subplot(1,3,3) 
-% imshow(pc_edges), hold on
-% for k = 1:length(lines)
-%    xy = [lines(k).point1; lines(k).point2];
-%    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
-% 
-%    % Plot beginnings and ends of lines
-%    plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
-%    plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
-% 
-%    % Determine the endpoints of the longest line segment
-%    len = norm(lines(k).point1 - lines(k).point2);
-%    if ( len > max_len)
-%       max_len = len;
-%       xy_long = xy;
-%    end
-% end
-% hold off
+subplot(2,3,1)
+imshow(pixelCandidates)
+subplot(2,3,2)
+imshow(pc_edges)
+%hough transform
+[H, theta,rho]=hough(pc_edges);
+subplot(2,3,3)
+%show hough transform
+imshow(H,[],'XData',theta,'YData',rho,...
+            'InitialMagnification','fit');
+xlabel('\theta'), ylabel('\rho');
+axis on, axis normal, hold on;
+%calculate peaks in HT
+P  = houghpeaks(H,10,'threshold',ceil(0.3*max(H(:))));
+%plot peaks in HT
+x = theta(P(:,2)); y = rho(P(:,1));
+plot(x,y,'s','color','white');
+hold off;
+%exract lines from HT and its peaks
+ lines = houghlines(H,theta,rho,P,'FillGap',5,'MinLength',2);
+%show lines in contour image
+subplot(2,3,4) 
+ imshow(pc_edges), hold on
+for k = 1:length(lines)
+   xy = [lines(k).point1; lines(k).point2]
+   plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+end
+hold off
 drawnow
 toc
 windowCandidates=[];
