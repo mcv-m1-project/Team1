@@ -62,7 +62,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         templates='';
     end
     
-        
+              f=figure;
     for i=1:size(dataset_split,2)
         % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
@@ -85,8 +85,9 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
          pixelCandidates = MorphologicalFiltering(pixelCandidates1);
 % 
         % Candidate Generation (window)
-        windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
-        %windowCandidates=HoughTransform(im, pixelCandidates);
+       % windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
+
+        windowCandidates=HoughTransform(im, pixelCandidates,f);
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
         for ind=1:size(windowCandidates,1)
