@@ -2,7 +2,7 @@
 % Template example for using on the validation set.
 %
 
-function TrafficSignDetection(directory, set, pixel_method, window_method, decision_method, plot_results)
+function TrafficSignDetection(directory, set, segm_method, pixel_method, window_method, decision_method, plot_results)
     tic
     close all;
 
@@ -16,6 +16,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     %    --------------      -----
     %    'directory'         directory where the test images to analize  (.jpg) reside
     %    'set'               'train' (training) or 'val' (validation)
+    %    'segm_method'       'mean_shift'
     %    'pixel_method'      Name of the color space: 'opp', 'normrgb', 'lab', 'hsv', etc. (Weeks 2-5)
     %    'window_method'     'SegmentationCCL' or 'SlidingWindow' (Weeks 3-5)
     %    'decision_method'   'GeometricHeuristics' or 'TemplateMatching' (Weeks 4-5)
@@ -56,38 +57,35 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
     
     % Load templates for correlation method
     if(strcmp(window_method,'template_corr'))
-
         templates = fullfile(directory, 'templates.mat');
     else
         templates='';
     end
     
-              f=figure;
     for i=1:size(dataset_split,2)
-        % fprintf('Image %s of %s\r', int2str(i), int2str( size(dataset_split,2)));
         % Read image
         im = imread(dataset_split(i).image);
-        %dataset_split(i).name
-        %pixelCandidates1 = testMeanShift(im, histogram);
-        pixelCandidates1 = CandidateGenerationPixel(im, 'hsv_thr', histogram);
-        imwrite(pixelCandidates1, strrep(strcat('DataSetDelivered/', dataset_split(i).name, '_seg.png'), '.jpg',''));
-%         if plot_results 
-%             hAx_color = subplot(1, 2, 1);
-%             imshow(pixelCandidates1, 'Parent', hAx_color);
-%             title('Color segmentation');
-%             hAx_morph = subplot(1, 2, 2);
-%             imshow(im, 'Parent', hAx_morph)
-%             drawnow
-%         end
+        
+        % Image segmentation
+        if ~strcmp(segm_method, '')
+            segm_im = ImageSegmentation(im, segm_method);
+        else
+            segm_im = im;
+        end
+        
         % Candidate Generation (pixel) 
-        %pixelCandidates1 = CandidateGenerationPixel(im, pixel_method, histogram);
+        pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
+        
         % Morphological filtering of candidate pixels
-         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
-% 
+        pixelCandidates = MorphologicalFiltering(pixelCandidates1);
+        
         % Candidate Generation (window)
-       % windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); 
-
-        windowCandidates=HoughTransform(im, pixelCandidates,f);
+        if strcmp('hough', window_method)
+            windowCandidates=HoughTransform(im, pixelCandidates,f);
+        else
+           windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram);  
+        end
+                
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
         for ind=1:size(windowCandidates,1)
@@ -99,7 +97,6 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         
         % Accumulate pixel performance of the current image 
         pixelAnnotation = imread(dataset_split(i).mask)>0;
-        
         
         % Original pixel candidates
         [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = ...
@@ -117,7 +114,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         pixelFN_post = pixelFN_post + localPixelFN_post;
         pixelTN_post = pixelTN_post + localPixelTN_post;
 
-        % Accumulate object performance of the current image %%%%%%%%%%%%%%%%  (Needed after Week 3)
+        % Accumulate object performance of the current image 
         windowAnnotations = LoadAnnotations(dataset_split(i).annotations);
         [localWindowTP, localWindowFN, localWindowFP] = PerformanceAccumulationWindow(windowCandidates, windowAnnotations);
         windowTP = windowTP + localWindowTP;
@@ -128,6 +125,7 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
         fprintf('Image %s of %s\r', int2str(i), int2str(size(dataset_split,2)));
 
         if plot_results 
+            f = figure;
             hAx_color = subplot(2, 2, 1);
             imshow(pixelCandidates1, 'Parent', hAx_color);
             title('Color segmentation');
@@ -144,7 +142,10 @@ function TrafficSignDetection(directory, set, pixel_method, window_method, decis
                 r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
                 setColor(r,'r');
             end
-            pause(1);
+            uiwait(f, 4);
+            if ishandle(f)
+                close(f);
+            end
         end
     end
 
