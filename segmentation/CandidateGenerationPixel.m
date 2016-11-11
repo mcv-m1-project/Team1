@@ -89,7 +89,7 @@ switch space
         end
         
     case 'hsv_thr'
-                pixelCandidates=zeros(size(im,1),size(im,2));
+        pixelCandidates=zeros(size(im,1),size(im,2));
         
         %Transform the image to HSV
         im_cs=rgb2hsv(im);

@@ -81,7 +81,7 @@ for i=1:size(windowCandidates,1)
     if nnz(del==i)==0
         for j=i+1:size(windowCandidates,1)
            if nnz(del==j)==0
-               if strcmp(window_method,'convolution') || strcmp(window_method,'template_matching')
+               if strcmp(window_method,'correlation') || strcmp(window_method,'template_matching')
                    if abs(windowCandidates(i,2) - windowCandidates(j,2))<=max([windowCandidates(i,3),windowCandidates(j,3)])/2
                        windowCandidates(i,1)=min(windowCandidates(i,1),windowCandidates(j,1));
                        windowCandidates(i,2)=min(windowCandidates(i,2),windowCandidates(j,2));
@@ -107,11 +107,15 @@ end
 windowCandidates(del,:)=[];  
 del=[];
 
-for i=1:size(windowCandidates,1)
-    if sum(sum(CandidateGenerationPixel(im(windowCandidates(i,2):windowCandidates(i,2)+windowCandidates(i,4), windowCandidates(i,1):windowCandidates(i,1)+windowCandidates(i,3),:), 'hsv', histogram)))<600
-        del = [del, i];
+% Filter window candidates by color (only Chamfer template matching)
+if strcmp(window_method, 'template_matching')
+    for i=1:size(windowCandidates,1)
+        if sum(sum(CandidateGenerationPixel(im(windowCandidates(i,2):windowCandidates(i,2)+windowCandidates(i,4), windowCandidates(i,1):windowCandidates(i,1)+windowCandidates(i,3),:), 'hsv', histogram)))<600
+            del = [del, i];
+        end
     end
 end
+
 windowCandidates(del,:)=[];  
 windCandidates = windowCandidates;
 end
