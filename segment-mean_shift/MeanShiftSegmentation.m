@@ -1,10 +1,10 @@
 function [Ims, Ims2, Ims3] = MeanShiftSegmentation(Im, window_shape, bandwidth)
-
+tic
 if nargin < 3
-    bandwidth = 0.15;
+    bandwidth = 0.1;
 end
 if nargin < 2
-    window_shape = 'gaussian';
+    window_shape = 'flat';
 end
 
 % Transform images to grayscale and HSV and resize them (1/4)
@@ -38,7 +38,7 @@ for i = 1:length(clustMembsCell)
     X(clustMembsCell{i},:) = repmat(clustCent(:,i)', size(clustMembsCell{i},2),1);  
     
     % Label each cluster
-    labeled_X(clustMembsCell{i}) = i;
+    labeled_X(clustMembsCell{i}) = i*255/length(clustMembsCell);
 end
 
 % Reshape images to original size and shape
@@ -51,7 +51,7 @@ Ims2=hsv2rgb(Ims2);
 Ims=imresize(Ims, 1/sc);
 Ims2=imresize(Ims2, 1/sc);
 Ims3=uint8(imresize(Ims3, 1/sc));
-
+toc
 end
 
 function [is_sign] = mean_shift_classification(cluster_center, hsv_pixel_values)
