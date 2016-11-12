@@ -2,7 +2,7 @@ function [ windowCandidates ] = HoughTransform(im, pixelCandidates)
 %HOUGHTRANSFORM Summary of this function goes here
 %   Detailed explanation goes here
 %figure(f);
-plot=false;
+plot=true;
 tic
 %extract contours
 pc_edges =  bwperim(pixelCandidates,8);
