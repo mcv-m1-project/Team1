@@ -8,7 +8,7 @@
 DataSetDelivered/train
 DataSetDelivered/test
 DataSetDelivered/fake_test
-*/segment-ucm/*
+segment-ucm/**
 # MATLAB files
 *.asv
 
