@@ -1,11 +1,12 @@
 function [windowCandidatesFinal] = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram)
 %CANDIDATEGENERATIONWINDOW Window candidates from pixel candidates
-%   Detailed explanation goes here
+
 pixel_method='hsv';
 switch(window_method)
     case 'ccl'
         windowCandidates = CCLWindow(im, pixelCandidates);
         windowCandidates = candidatesArbitration(windowCandidates,window_method, histogram, im);
+        windowCandidates = candidatesPostFiltering(windowCandidates);
     case {'naive_window', 'integral_window' }
         windowCandidates = SlidingWindow(im, pixelCandidates, window_method);
         windowCandidates = candidatesArbitration(windowCandidates,window_method, histogram, im);
@@ -40,27 +41,12 @@ switch(window_method)
         windowCandidates=TemplateMatchingCorrelation (im, pixelCandidates, templates);
         windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
     case 'hough'
-         windowCandidates=HoughTransform(im, pixelCandidates);
-         windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
+        windowCandidates=HoughTransform(im, pixelCandidates);
+        windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
+
     otherwise
-        error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, template_corr');
+        error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, template_corr, hough');
 end
-
-
-% Window candidates post-filtering
-% keep=[];
-% N = size(windowCandidates, 1);
-% for ind=1:N
-%     bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
-%             min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
-%             min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
-%     f_factor = form_factor(bbox);
-%     if (f_factor > 0.5 && f_factor < 2)
-%         keep = [keep ind];
-%     end
-% end
-% windowCandidates = windowCandidates(keep, :);
-
 
 % Window candidates transformation to struct
 windowCandidatesFinal=[];
@@ -77,6 +63,7 @@ end
 
 end
 
+%% CANDIDATES ARBITRATION
 function windCandidates = candidatesArbitration(windowCandidates,window_method, histogram,im)
 % Window candidates arbitration
 del=[];
@@ -121,4 +108,20 @@ end
 
 windowCandidates(del,:)=[];  
 windCandidates = windowCandidates;
+end
+
+%% CANDIDATES POST-FILTERING
+function winCandidates = candidatesPostFiltering(windowCandidates)
+keep=[];
+N = size(windowCandidates, 1);
+for ind=1:N
+    bbox = [windowCandidates(ind, 2), windowCandidates(ind, 1), ...
+            min(windowCandidates(ind, 2) + windowCandidates(ind, 4), size(pixelCandidates, 1)), ...
+            min(windowCandidates(ind, 1) + windowCandidates(ind, 3), size(pixelCandidates, 2))];
+    f_factor = form_factor(bbox);
+    if (f_factor > 0.5 && f_factor < 2)
+        keep = [keep ind];
+    end
+end
+winCandidates = windowCandidates(keep, :);
 end
