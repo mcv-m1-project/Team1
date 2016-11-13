@@ -29,13 +29,8 @@ if numel(circen_t_2) > 0
     plot(circen_t_2(:,1), circen_t_2(:,2), 'r+');
 end
 
-for k=1:size(circen_t_1, 1)
-    circ = viscircles(circen_t_1, cirrad_t_1, 'Color', 'b', 'LineWidth', 2, 'LineStyle', '-');
-end
-for k=1:size(circen_t_2, 1)
-    circ = viscircles(circen_t_2, cirrad_t_2, 'Color', 'r', 'LineWidth', 2, 'LineStyle', '-');
-end
-hold off;
+circ = viscircles(circen_t_1, cirrad_t_1, 'Color', 'b', 'LineWidth', 2, 'LineStyle', '-');
+circ = viscircles(circen_t_2, cirrad_t_2, 'Color', 'r', 'LineWidth', 2, 'LineStyle', '-');
 title(['Raw Image with Circles Detected ', ...
  '(center positions and radii marked) - Positive example']);
 

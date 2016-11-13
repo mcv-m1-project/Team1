@@ -79,15 +79,10 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
         % Morphological filtering of candidate pixels
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
         
-      % imwrite(pixelCandidates, strcat('provaMS/m',dataset_split(i).name,'.png'));
+        % imwrite(pixelCandidates, strcat('provaMS/m',dataset_split(i).name,'.png'));
+        
         % Candidate Generation (window)
-        if strcmp('hough', window_method)
-            windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram);  
-      
-        else
-        %   windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram);  
-        windowCandidates =[];
-        end
+        windowCandidates = CandidateGenerationWindow(segm_im, pixelCandidates, window_method, templates, histogram);  
                 
         % Filter candidate pixels with candidate windows 
         pixelCandidatesFinal=zeros(size(pixelCandidates));
