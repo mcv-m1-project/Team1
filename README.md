@@ -27,11 +27,11 @@ Run the `TrafficSignDetection_test` function with the necessary input arguments.
 
 | Parameter name | Possible value/s | Description |
 | :---: | :---: |  :---: |
-|directory | - | Directory where the test images to analize  (.jpg) reside
-| set | 'train', 'val' | Training or Validation set
+| input_dir | Path | Directory where the test images to analize (.jpg) reside
+| output_dir | Path | Directory where the masks and bounding boxes will be stored |
 | segm_method | 'mean_shift', 'ucm' | Region-based color segmentation method |
-| pixel_method | 'hsv' | Pixe-based color segmentation method |
-| window_method | 'ccl', 'naive_window', 'integral_window', 'correlation', 'template_matching', 'template_corr', 'hough' | Window candidate generation method
+| pixel_method | 'hsv', 'hsv_thr', 'normrgb | Pixe-based color segmentation method |
+| window_method | 'ccl', 'naive_window', 'integral_window', 'correlation', 'template_matching', 'template_corr', 'hough' | Window candidate generation method |
 | plot_results | 0, 1 | Whether to interactively plot the results or not | 
 
 - **Performance evaluation**
