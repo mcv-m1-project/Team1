@@ -83,6 +83,9 @@ switch(method)
         
         pixelCandidates = bwareaopen(pixelCandidates, 600, 4);
         pixelCandidates= pixelCandidates & ~bwareaopen(pixelCandidates, 80000);
+        
+    case 5
+        pixelCandidates = imfill(pixelCandidates, 'holes');
 
     otherwise
         error('You must specify one of the two following methods: 1, 2, 3, 4');
