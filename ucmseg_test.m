@@ -1,7 +1,7 @@
 windowTP=0; windowFN=0; windowFP=0; % (Needed after Week 3)
 pixelTP=0; pixelFN=0; pixelFP=0; pixelTN=0;
 pixelTP_post=0; pixelFN_post=0; pixelFP_post=0; pixelTN_post=0;
-files = ListFiles('ucmSeg04');
+files = ListFiles('ucmSeg04Val');
 templates = fullfile('DataSetDelivered/', 'templates.mat');
 PROPORTION = 0.85;
 for i = 1:length(files)
@@ -24,11 +24,9 @@ for i = 1:length(files)
             continue
         end
         
-        color_filter = (...
-            (...
-            (h(region) >= 0.9) + (h(region) <= 0.1)  + ( (h(region) >= 0.45) .* (h(region) <= 0.7) ) ...
-            ) .* ( (s(region) >= 0.5) + (v(region) >= 0.2) ) ...
-            );
+        color_filter = ( ( (h(region) >= 0.9) | (h(region) <= 0.1) ...
+                        | ( (h(region) >= 0.45) & (h(region) <= 0.7) ) ) ...
+                        & ( (s(region) >= 0.4) & (v(region) >= 0.1) ) );
         proportion = nnz(color_filter) / numel(color_filter);
         
         if proportion >= PROPORTION
@@ -36,14 +34,15 @@ for i = 1:length(files)
         end
         
     end
-    
+ 
     output=imfill(output,'holes');
     
-%     subplot(1,2,1)
-%     imshow(255*mask)
-%     subplot(1,2,2)
-%     imshow(255*output)
-%     drawnow()   
+%     subplot(1,2,1);
+%     imshow(im);
+%     subplot(1,2,2);
+%     imshow(output);
+%     waitforbuttonpress();
+%     drawnow();
     
     
     [localPixelTP, localPixelFP, localPixelFN, localPixelTN] = ...
