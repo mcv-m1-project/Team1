@@ -1,6 +1,6 @@
 function [Ims] = MeanShiftSegmentation(Im, window_shape, bandwidth)
 %function [Ims, Ims2, Ims3] = MeanShiftSegmentation(Im, window_shape, bandwidth)
-tic
+
 if nargin < 3
     bandwidth = 0.1;
 end
@@ -52,7 +52,6 @@ Ims = reshape(X1(:), size(I,1), size(I,2));
 Ims=imresize(Ims, 1/sc);
 %Ims2=imresize(Ims2, 1/sc);
 %Ims3=uint8(imresize(Ims3, 1/sc));
-toc
 end
 
 function [is_sign] = mean_shift_classification(cluster_center, hsv_pixel_values)
