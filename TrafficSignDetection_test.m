@@ -71,9 +71,11 @@ for i=1:size(files,1)
         segm_im = im;
         pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
     end
-    % Morphological filtering of candidate pixels
-    pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
+    if ~strcmp(segm_method, 'ucm')
+        % Morphological filtering of candidate pixels
+        pixelCandidates = MorphologicalFiltering(pixelCandidates);
+    end
     % Candidate Generation (window)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     windowCandidates = CandidateGenerationWindow(im, pixelCandidates, window_method, templates, histogram); %%'SegmentationCCL' or 'SlidingWindow'  (Needed after Week 3)
