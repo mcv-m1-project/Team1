@@ -145,7 +145,8 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
                 r=imrect(hAx_window, [windowCandidates(zz,1).x, windowCandidates(zz,1).y, windowCandidates(zz,1).w, windowCandidates(zz,1).h]);
                 setColor(r,'r');
             end
-            uiwait(f, 4);
+            %uiwait(f, 4);            
+            waitforbuttonpress
             if ishandle(f)
                 close(f);
             end

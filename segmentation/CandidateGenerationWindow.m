@@ -41,7 +41,7 @@ switch(window_method)
         windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
     case 'hough'
          windowCandidates=HoughTransform(im, pixelCandidates);
-       %  windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
+         windowCandidates = candidatesArbitration(windowCandidates, window_method, histogram, im);
     otherwise
         error ('No valid method selected. Use one of these instead: ccl, naive_window, integral_window, correlation, template_matching, template_corr');
 end

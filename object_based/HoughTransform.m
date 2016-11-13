@@ -12,8 +12,10 @@ pc_edges=imdilate(pc_edges,se);
 %thin contour
 %pc_edges=bwmorph(pc_edges,'thin','Inf');
 if plotting
-subplot(2,2,1)
+    
+subplot(2,3,1)
 imshow(pixelCandidates)
+title('Input mask')
 end
 %hough transform
 [H, theta,rho]=hough(pc_edges);
@@ -25,7 +27,7 @@ end
 % axis on, axis normal, hold on;
 %calculate peaks in HT
 %
-P  = houghpeaks(H,50,'threshold',ceil(0.3*max(H(:))));
+P  = houghpeaks(H,25,'threshold',ceil(0.3*max(H(:))));
 %P  = houghpeaks(H,100);
 %plot peaks in HT
 %x = theta(P(:,2)); y = rho(P(:,1));
@@ -36,7 +38,11 @@ lines = houghlines(pc_edges,theta,rho,P,'FillGap',50,'MinLength',20);
 thetas=[];
 rhos=[];
 if plotting
-subplot(2,2,2), imshow(pc_edges), hold on
+    
+subplot(2,3,2)
+imshow(pc_edges)
+title('Contour image')
+subplot(2,3,3), imshow(pc_edges), hold on
 for k = 1:length(lines)
     thetas=[thetas lines(k).theta];
     rhos=[rhos lines(k).rho];
@@ -45,7 +51,7 @@ for k = 1:length(lines)
 end
 hold off
 end
-
+title('Detected hough segments')
 %%%%% HOUGH Heuristics
 if(~isempty(lines))
 %cell with different detected shapes. Every shape is a vector with vector
@@ -154,7 +160,7 @@ end
 disp(['Num shapes after filter shape ' int2str(length(def_shapes_))]);
 if plotting
 %show lines in contour image
-subplot(2,2,3)
+subplot(2,3,4)
 imshow(pc_edges), hold on
 for i=1:length(def_shapes_)
    vec= def_shapes_{i};
@@ -175,8 +181,8 @@ for k = 1:length(vec)
 end
 end
 hold off
+title('Shapes in different colors')
 end
-end %end if lines is not empty
 
 %%%%% HOUGH Heuristics
 
@@ -185,25 +191,33 @@ end %end if lines is not empty
 windowCandidates=[];
 for i=1:length(def_shapes_)
    bb=getBoundingBox(lines,def_shapes_{i});
-    windowCandidates=[windowCandidates; bb];                             
+   if (bb(3)/bb(4)<2.3 && bb(3)/bb(4)>0.5)
+    windowCandidates=[windowCandidates; bb];      
+   end
 end
 if plotting
-h=subplot(2,2,4); imshow(pc_edges,'Parent',h),hold on
+subplot(2,3,5), scatter(thetas,rhos)
+title('Theta and rho scatter')
+h=subplot(2,3,6); imshow(pixelCandidates,'Parent',h),hold on
   for zz = 1:size(windowCandidates,1)
       w=windowCandidates;
-          r=rectangle(h,'Position', [w(zz,1), w(zz,2), w(zz,3), w(zz,4)], 'LineWidth',2,'EdgeColor','b');
+          r=rectangle(h,'Position', [w(zz,1), w(zz,2), w(zz,3), w(zz,4)], 'LineWidth',1,'EdgeColor','b');
                
-  end     
+  end   
+  title('Final bounding boxes without merge')
 drawnow
 waitforbuttonpress
 end
+else 
+    windowCandidates=[];
+end %end if lines is not empty
 toc
 end
 
 function [closest_ind,end_seg_]=findClosestPoint(lines,pool,ind,end_seg)
 %find closest point to lines(ind) in lines
 %window size;
-w=40;
+w=15;
 %evaluate window around point1 or point2, depending on the point previously
 %matched as candidate in last iteration.
 end_seg_=0;
