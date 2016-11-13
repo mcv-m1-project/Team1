@@ -66,7 +66,7 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
         % Read image
         im = imread(dataset_split(i).image);
         
-        % Image segmentation
+        % Image segmentation / Pixel candidate generation
         if ~strcmp(segm_method, '')
             pixelCandidates1 = ImageSegmentation(im, segm_method);
             segm_im=pixelCandidates1;
@@ -74,9 +74,6 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
             segm_im = im;
             pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
         end
-        %segm_im(segm_im~=0) = 1;
-        % Candidate Generation (pixel) 
-        %pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
        
         % Morphological filtering of candidate pixels
         pixelCandidates = MorphologicalFiltering(pixelCandidates1);
