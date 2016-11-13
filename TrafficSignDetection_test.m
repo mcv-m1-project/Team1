@@ -2,7 +2,7 @@
 % Template example for using on the test set (no annotations).
 %
 
-function TrafficSignDetection_test(input_dir, output_dir, pixel_method, window_method, decision_method, plot_results)
+function TrafficSignDetection_test(input_dir, output_dir, segm_method, pixel_method, window_method, decision_method, plot_results)
 % TrafficSignDetection
 % Perform detection of Traffic signs on images. Detection is performed first at the pixel level
 % using a color segmentation. Then, using the color segmentation as a basis, the most likely window
@@ -64,8 +64,13 @@ for i=1:size(files,1)
     im = imread(strcat(input_dir,'/',files(i).name));
     
     % Candidate Generation (pixel) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    pixelCandidates = CandidateGenerationPixel(im, pixel_method, histogram);
-    
+    if ~strcmp(segm_method, '')
+        pixelCandidates1 = ImageSegmentation(im, segm_method);
+        segm_im=pixelCandidates1;
+    else
+        segm_im = im;
+        pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
+    end
     % Morphological filtering of candidate pixels
     pixelCandidates = MorphologicalFiltering(pixelCandidates);
     
