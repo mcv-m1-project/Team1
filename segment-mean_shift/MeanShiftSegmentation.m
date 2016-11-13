@@ -1,4 +1,5 @@
-function [Ims, Ims2, Ims3] = MeanShiftSegmentation(Im, window_shape, bandwidth)
+function [Ims] = MeanShiftSegmentation(Im, window_shape, bandwidth)
+%function [Ims, Ims2, Ims3] = MeanShiftSegmentation(Im, window_shape, bandwidth)
 tic
 if nargin < 3
     bandwidth = 0.1;
@@ -43,14 +44,14 @@ end
 
 % Reshape images to original size and shape
 Ims = reshape(X1(:), size(I,1), size(I,2));
-Ims2 = reshape(X(:,1:3), size(I,1), size(I,2), 3); 
-Ims3 = reshape(labeled_X(:), size(I,1), size(I,2));
+%Ims2 = reshape(X(:,1:3), size(I,1), size(I,2), 3); 
+%Ims3 = reshape(labeled_X(:), size(I,1), size(I,2));
 
 % Segmented Image
-Ims2=hsv2rgb(Ims2);
+%Ims2=hsv2rgb(Ims2);
 Ims=imresize(Ims, 1/sc);
-Ims2=imresize(Ims2, 1/sc);
-Ims3=uint8(imresize(Ims3, 1/sc));
+%Ims2=imresize(Ims2, 1/sc);
+%Ims3=uint8(imresize(Ims3, 1/sc));
 toc
 end
 
@@ -76,7 +77,7 @@ function [is_sign] = mean_shift_classification(cluster_center, hsv_pixel_values)
             color_filter = (...
                 (...
                     (hsv_pixel_values(:, 1) >= 0.925) + (hsv_pixel_values(:, 1) <= 0.08)  + ( (hsv_pixel_values(:, 1) >= 0.5) .* (hsv_pixel_values(:, 1) <= 0.78) ) ...
-                ) .* ( (hsv_pixel_values(:, 2) >= 0.2) + (hsv_pixel_values(:, 3)>= 0.1) ) ...
+                ) .* ( (hsv_pixel_values(:, 2) >= 0.35) + (hsv_pixel_values(:, 3)>= 0.2) ) ...
             );
             proportion = sum(sum(logical(color_filter))) / numel(color_filter);
             is_sign = proportion >= PROPORTION;
