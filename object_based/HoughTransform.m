@@ -2,7 +2,7 @@ function [ windowCandidates ] = HoughTransform(im, pixelCandidates)
 %HOUGHTRANSFORM Summary of this function goes here
 %   Detailed explanation goes here
 
-plotting=true;
+plotting=false;
 
 if plotting
     tic;    
@@ -51,7 +51,9 @@ for k = 1:length(lines)
     rhos=[rhos lines(k).rho];
    xy = [lines(k).point1; lines(k).point2];
    plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+
 end
+
 hold off
 title('Detected hough segments')
 
@@ -172,42 +174,13 @@ if(~isempty(lines))
             k=k+1;
         end
     end
-    if plotting
-        disp(['Num shapes after filter shape ' int2str(length(def_shapes_))]);
-        %show lines in contour image
-        subplot(2,2,3)
-        imshow(pc_edges), hold on
-        for i=1:length(def_shapes_)
-            vec= def_shapes_{i};
-            if i==1
-            color='green';
-            elseif i==2
-               color='red';
-            elseif i==3
-               color='blue';
-            elseif i==4
-               color='magenta';
-            else
-               color='yellow';
-            end
-            for k = 1:length(vec)
-                xy = [lines(vec(k)).point1; lines(vec(k)).point2];
-                plot(xy(:,1),xy(:,2),'LineWidth',2,'Color',color);
-            end
-        end
-        hold off
-    end
+
 
 %% HOUGH Bounding boxes
 
 % Get BB from shape (triangle and square heuristics)
 windowCandidates=[];
-if exist('def_shapes_', 'var')
-    for i=1:length(def_shapes_)
-        bb=getBoundingBox(lines, def_shapes_{i});
-        windowCandidates=[windowCandidates; bb];                             
-    end
-end
+
 disp(['Num shapes after filter shape ' int2str(length(def_shapes_))]);
 if plotting
 %show lines in contour image
@@ -231,10 +204,16 @@ for k = 1:length(vec)
     plot(xy(:,1),xy(:,2),'LineWidth',2,'Color',color);
 end
 end
+if ~isempty(circen_1) 
+ circ1 = viscircles(circen_1, cirrad_1, 'Color', 'b', 'LineWidth', 1, 'LineStyle', '--');
+end
+if ~isempty(circen_2)
+    circ2 = viscircles(circen_2, cirrad_2, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '--');
+end 
 hold off
 title('Shapes in different colors')
 end
-
+windowCandidates=[];
 %%%%% HOUGH Heuristics
 % Get BB from circle centers and radius
 if numel(circen_1) > 0
@@ -251,26 +230,24 @@ if numel(circen_2) > 0
         windowCandidates=[windowCandidates; bb];
     end 
 end
+for i=1:length(def_shapes_)
+   bb=getBoundingBox(lines,def_shapes_{i});
+  fr= nnz(pixelCandidates(bb(2):bb(2)+bb(4),bb(1):bb(1)+bb(3)))/(bb(3)*bb(4));
+   if (bb(3)/bb(4)<2.3 && bb(3)/bb(4)>0.5 && fr>0.3)
+    windowCandidates=[windowCandidates; bb];      
+   end
+end
 if plotting
    subplot(2,3,5), scatter(thetas,rhos)
 title('Theta and rho scatter')
 h=subplot(2,3,6); imshow(pixelCandidates,'Parent',h),hold on
   for zz = 1:size(windowCandidates,1)
       w=windowCandidates;
-          r=rectangle(h,'Position', [w(zz,1), w(zz,2), w(zz,3), w(zz,4)], 'LineWidth',1,'EdgeColor','b');
+      r=rectangle(h,'Position', [w(zz,1), w(zz,2), w(zz,3), w(zz,4)], 'LineWidth',1,'EdgeColor','b');
                
   end   
   title('Final bounding boxes without merge')
-windowCandidates=[];
-for i=1:length(def_shapes_)
-   bb=getBoundingBox(lines,def_shapes_{i});
-   if (bb(3)/bb(4)<2.3 && bb(3)/bb(4)>0.5 && filling_ratio(bb,pixelCandidates)>0.3)
-    windowCandidates=[windowCandidates; bb];      
-   end
-end
-    circ1 = viscircles(circen_1, cirrad_1, 'Color', 'b', 'LineWidth', 1, 'LineStyle', '--');
-    circ2 = viscircles(circen_2, cirrad_2, 'Color', 'r', 'LineWidth', 1, 'LineStyle', '--');
-    drawnow
+  drawnow
     waitforbuttonpress
 end
 
