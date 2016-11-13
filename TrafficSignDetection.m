@@ -76,8 +76,9 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
         end
        
         % Morphological filtering of candidate pixels
-        pixelCandidates = MorphologicalFiltering(pixelCandidates1);
-        
+        if ~strcmp(segm_method, 'ucm')
+            pixelCandidates = MorphologicalFiltering(pixelCandidates1);
+        end
         % imwrite(pixelCandidates, strcat('provaMS/m',dataset_split(i).name,'.png'));
         
         % Candidate Generation (window)
