@@ -9,6 +9,7 @@ DataSetDelivered/train
 DataSetDelivered/test
 DataSetDelivered/fake_test
 segment-ucm/**
+ucm04MaskTemp/**
 # MATLAB files
 *.asv
 
