@@ -2,7 +2,7 @@ function [ windowCandidates ] = HoughTransform(im, pixelCandidates)
 %HOUGHTRANSFORM Summary of this function goes here
 %   Detailed explanation goes here
 
-plotting=false;
+plotting=true;
 
 if plotting
     tic;    
@@ -108,7 +108,7 @@ if(~isempty(lines))
         if closest_ind~=-1 
             theta_diff=abs(ref_theta-lines(closest_ind).theta);
 
-            if(theta_diff<10  || (theta_diff<90 && theta_diff>20)) 
+            if(theta_diff<10  || (theta_diff<95 && theta_diff>20)) 
                 %take next ind as closest_ind
                 ind=closest_ind;
             else

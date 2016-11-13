@@ -72,7 +72,7 @@ function TrafficSignDetection(directory, set, segm_method, pixel_method, window_
         else
             segm_im = im;
         end
-        
+        %segm_im(segm_im~=0) = 1;
         % Candidate Generation (pixel) 
         pixelCandidates1 = CandidateGenerationPixel(segm_im, pixel_method, histogram);
        
