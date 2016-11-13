@@ -25,6 +25,15 @@ Note that this computation is not deterministic, as it involves random permutati
 
 Run the `TrafficSignDetection_test` function with the necessary input arguments. For example `TrafficSignDetection_test('DataSetDelivered/test','test','hsv','convolution','', 0)`. The created masks will be stored in the specified output directory ('test' in the example).
 
+| Parameter name | Possible value/s | Description |
+| :---: | :---: |  :---: |
+|directory | - | Directory where the test images to analize  (.jpg) reside
+| set | 'train', 'val' | Training or Validation set
+| segm_method | 'mean_shift', 'ucm' | Region-based color segmentation method |
+| pixel_method | 'hsv' | Pixe-based color segmentation method |
+| window_method | 'ccl', 'naive_window', 'integral_window', 'correlation', 'template_matching', 'template_corr', 'hough' | Window candidate generation method
+| plot_results | 0, 1 | Whether to interactively plot the results or not | 
+
 - **Performance evaluation**
 
   - `TrafficSignDetection`: evaluates the default performance of the system in terms of **precision**, **accuracy**, **specificity** and **sensitivity** pixel values over the train ('train') or validation ('val') splits.
