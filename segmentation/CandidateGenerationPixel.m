@@ -88,6 +88,25 @@ switch space
             end
         end
         
+    case 'hsv_thr'
+        pixelCandidates=zeros(size(im,1),size(im,2));
+        
+        %Transform the image to HSV
+        im_cs=rgb2hsv(im);
+        %Take the Hue and Saturation components
+        H=im_cs(:,:,1);
+        S=im_cs(:,:,2);
+        V=im_cs(:,:,3);
+        for s1=1:size(im,1)
+            for s2=1:size(im,2)
+                if ((H(s1,s2)>= 0.925 || H(s1,s2)<= 0.059  || (H(s1,s2)>= 0.55 && H(s1,s2) <= 0.78)) && (S(s1,s2)>= 0.4 && V(s1,s2)>= 0.1))
+                    pixelCandidates(s1,s2)=1;
+                end
+            end
+        end
+            
+        
+            
     otherwise
         error('Incorrect color space defined');
 end

@@ -8,8 +8,11 @@
 DataSetDelivered/train
 DataSetDelivered/test
 DataSetDelivered/fake_test
-
+segment-ucm/**
+ucm04MaskTemp/**
+ucmSeg04Val/*.jpg.png
 # MATLAB files
 *.asv
 
 *.jpg
+DataSetDelivered/*.png
